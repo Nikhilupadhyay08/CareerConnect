@@ -5,6 +5,7 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 ## 🚀 Features
 
 ### 👤 Authentication & Authorization
+
 - User registration and login
 - JWT-based authentication
 - Password hashing with bcrypt
@@ -13,6 +14,7 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 - Protected routes
 
 ### 🔎 Job Seeker
+
 - Browse available jobs
 - Search jobs by title or company
 - Filter jobs by location and job type
@@ -24,6 +26,7 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 - Manage profile
 
 ### 🏢 Employer
+
 - Create job postings
 - Edit existing job postings
 - Delete job postings
@@ -33,6 +36,7 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 - Manage employer profile
 
 ### 📄 Resume Management
+
 - PDF resume upload
 - File size validation
 - Cloudinary integration for cloud storage
@@ -40,6 +44,7 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - React.js
 - React Router
 - JavaScript
@@ -48,45 +53,10 @@ A full-stack MERN job portal that connects job seekers and employers through a s
 - Vite
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB
 - Mongoose
 - JWT
-- bcryptjs
-- Multer
-
-### Cloud & Tools
-- Cloudinary
-- Git & GitHub
-- Postman
-- MongoDB Atlas
-
-## 🏗️ Project Structure
-
-```text
-CareerConnect/
-│
-├── backend/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── utils/
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   └── services/
-│   ├── package.json
-│   └── vite.config.js
-│
-├── .gitignore
-└── README.md
+- bcrypt
