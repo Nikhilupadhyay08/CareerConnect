@@ -2,11 +2,40 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      userId: user._id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
+};
+
 // Register user
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    // Validate role
+    if (!["jobseeker", "employer"].includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role",
+      });
+    }
+
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -15,18 +44,29 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: role || "jobseeker",
+      role,
     });
+
+    // Generate token
+    const token = generateToken(user);
 
     res.status(201).json({
       message: "User registered successfully",
-      userId: user._id,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -41,6 +81,14 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
+
+    // Find user
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -49,6 +97,7 @@ const loginUser = async (req, res) => {
       });
     }
 
+    // Compare password
     const isPasswordCorrect = await bcrypt.compare(
       password,
       user.password
@@ -60,16 +109,8 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+    // Generate token
+    const token = generateToken(user);
 
     res.json({
       message: "Login successful",
@@ -114,13 +155,7 @@ const getMyProfile = async (req, res) => {
 // Update logged-in user's profile
 const updateMyProfile = async (req, res) => {
   try {
-    const { name } = req.body;
-
-    if (!name || !name.trim()) {
-      return res.status(400).json({
-        message: "Name is required",
-      });
-    }
+    const { name, email } = req.body;
 
     const user = await User.findById(req.user.userId);
 
@@ -130,7 +165,26 @@ const updateMyProfile = async (req, res) => {
       });
     }
 
-    user.name = name.trim();
+    // Update name
+    if (name) {
+      user.name = name;
+    }
+
+    // Update email
+    if (email) {
+      const existingUser = await User.findOne({
+        email,
+        _id: { $ne: user._id },
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          message: "Email is already in use",
+        });
+      }
+
+      user.email = email;
+    }
 
     await user.save();
 

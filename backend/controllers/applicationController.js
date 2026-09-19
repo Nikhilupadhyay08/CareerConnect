@@ -1,6 +1,9 @@
 const Application = require("../models/Application");
 const Job = require("../models/Job");
+const User = require("../models/User");
+
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
+const sendEmail = require("../utils/mail");
 
 // Apply for a job
 const applyForJob = async (req, res) => {
@@ -42,6 +45,15 @@ const applyForJob = async (req, res) => {
       });
     }
 
+    // Get applicant details for email
+    const applicant = await User.findById(req.user.userId);
+
+    if (!applicant) {
+      return res.status(404).json({
+        message: "Applicant not found",
+      });
+    }
+
     // Upload resume to Cloudinary
     const uploadResult = await uploadToCloudinary(req.file.buffer);
 
@@ -52,6 +64,79 @@ const applyForJob = async (req, res) => {
       resume: uploadResult.secure_url,
     });
 
+    // Send application confirmation email
+    // Email failure will NOT cancel the application
+    try {
+      await sendEmail({
+        to: applicant.email,
+        subject: `Application Submitted - ${job.title}`,
+
+        text: `Hello ${applicant.name},
+
+Your application for the position of ${job.title} at ${job.company} has been submitted successfully.
+
+Application Status: Applied
+
+You can track your application status from your CareerConnect dashboard.
+
+Thank you for using CareerConnect.
+
+Best regards,
+CareerConnect Team`,
+
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px;">
+
+            <h2 style="color: #2563eb;">
+              Application Submitted Successfully
+            </h2>
+
+            <p>
+              Hello ${applicant.name},
+            </p>
+
+            <p>
+              Your application for
+              <strong>${job.title}</strong>
+              at
+              <strong>${job.company}</strong>
+              has been submitted successfully.
+            </p>
+
+            <p>
+              <strong>Application Status:</strong>
+              Applied
+            </p>
+
+            <p>
+              You can track your application status from your
+              CareerConnect dashboard.
+            </p>
+
+            <p>
+              Thank you for using CareerConnect.
+            </p>
+
+            <p>
+              Best regards,<br />
+              <strong>CareerConnect Team</strong>
+            </p>
+
+          </div>
+        `,
+      });
+
+      console.log(
+        `Application confirmation email sent to ${applicant.email}`
+      );
+    } catch (emailError) {
+      console.error(
+        "Application saved, but confirmation email failed:",
+        emailError.message
+      );
+    }
+
+    // Send successful application response
     res.status(201).json({
       message: "Application submitted successfully",
       application,
