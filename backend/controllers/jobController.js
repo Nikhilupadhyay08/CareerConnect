@@ -223,7 +223,9 @@ const getMyJobs = async (req, res) => {
       count: jobs.length,
       jobs,
     });
-  } catch (error) {
+    } catch (error) {
+    console.error("GET MY JOBS ERROR:", error);
+
     res.status(500).json({
       message: "Failed to fetch your jobs",
       error: error.message,
