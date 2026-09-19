@@ -61,13 +61,13 @@ function Home() {
 
           <div className="hero-stat-row">
             <div>
-              <strong>100+</strong>
-              <span>Opportunities</span>
+              <strong>01</strong>
+              <span>Find opportunities</span>
             </div>
 
             <div>
-              <strong>24/7</strong>
-              <span>Access</span>
+              <strong>02</strong>
+              <span>Build your career</span>
             </div>
           </div>
         </div>
