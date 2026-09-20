@@ -3,15 +3,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMyJobs, deleteJob } from "../services/api";
 
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+
 function EmployerDashboard() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
   const [jobs, setJobs] = useState([]);
+  const [applicantCounts, setApplicantCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch employer's jobs
+  // Fetch employer's jobs and applicant counts
   const fetchMyJobs = async () => {
     try {
       setLoading(true);
@@ -19,7 +23,40 @@ function EmployerDashboard() {
 
       const data = await getMyJobs(token);
 
-      setJobs(data.jobs || []);
+      const employerJobs = data.jobs || [];
+
+      setJobs(employerJobs);
+
+      // Fetch applicant count for each job
+      const counts = {};
+
+      await Promise.all(
+        employerJobs.map(async (job) => {
+          try {
+            const response = await fetch(
+              `${API_URL}/applications/job/${job._id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (!response.ok) {
+              counts[job._id] = 0;
+              return;
+            }
+
+            const applicationData = await response.json();
+
+            counts[job._id] = applicationData.count || 0;
+          } catch {
+            counts[job._id] = 0;
+          }
+        })
+      );
+
+      setApplicantCounts(counts);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -51,6 +88,14 @@ function EmployerDashboard() {
       setJobs((currentJobs) =>
         currentJobs.filter((job) => job._id !== jobId)
       );
+
+      setApplicantCounts((currentCounts) => {
+        const updatedCounts = { ...currentCounts };
+
+        delete updatedCounts[jobId];
+
+        return updatedCounts;
+      });
     } catch (error) {
       setError(error.message);
     }
@@ -259,7 +304,21 @@ function EmployerDashboard() {
                       </span>
 
                       <span>
-                        📅 Posted recently
+                        👥 {applicantCounts[job._id] || 0}{" "}
+                        {applicantCounts[job._id] === 1
+                          ? "Applicant"
+                          : "Applicants"}
+                      </span>
+
+                      <span>
+                        📅 Posted{" "}
+                        {new Date(
+                          job.createdAt
+                        ).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
 
                     </div>
@@ -316,7 +375,8 @@ function EmployerDashboard() {
                             )
                           }
                         >
-                          Applicants
+                          Applicants (
+                          {applicantCounts[job._id] || 0})
                         </button>
 
                         <button

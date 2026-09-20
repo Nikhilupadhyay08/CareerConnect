@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMyApplications } from "../services/api";
-const API_URL = "http://localhost:4000/api";
 
 function JobSeekerDashboard() {
   const { token, user } = useAuth();
@@ -46,6 +45,10 @@ function JobSeekerDashboard() {
 
   const hiredCount = applications.filter(
     (application) => application.status === "Hired"
+  ).length;
+
+  const rejectedCount = applications.filter(
+    (application) => application.status === "Rejected"
   ).length;
 
   // Get status class
@@ -130,6 +133,17 @@ function JobSeekerDashboard() {
             <div>
               <span>Shortlisted</span>
               <strong>{shortlistedCount}</strong>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              ❌
+            </div>
+
+            <div>
+              <span>Rejected</span>
+              <strong>{rejectedCount}</strong>
             </div>
           </div>
 

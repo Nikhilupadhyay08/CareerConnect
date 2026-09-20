@@ -280,9 +280,139 @@ const updateApplicationStatus = async (req, res) => {
   }
 };
 
+// View resume in browser
+const viewResume = async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({
+        message: "Only employers can view resumes",
+      });
+    }
+
+    const application = await Application.findById(
+      req.params.applicationId
+    ).populate("job");
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found",
+      });
+    }
+
+    // Make sure this application belongs to the employer's job
+    if (
+      application.job.employer.toString() !==
+      req.user.userId
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to view this resume",
+      });
+    }
+
+    if (!application.resume) {
+      return res.status(404).json({
+        message: "Resume not found",
+      });
+    }
+
+    const response = await fetch(application.resume);
+
+    if (!response.ok) {
+      return res.status(500).json({
+        message: "Failed to fetch resume",
+      });
+    }
+
+    const buffer = Buffer.from(
+      await response.arrayBuffer()
+    );
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'inline; filename="resume.pdf"'
+    );
+
+    res.send(buffer);
+  } catch (error) {
+    console.error("View resume error:", error);
+
+    res.status(500).json({
+      message: "Failed to view resume",
+      error: error.message,
+    });
+  }
+};
+
+// Download resume
+const downloadResume = async (req, res) => {
+  try {
+    if (req.user.role !== "employer") {
+      return res.status(403).json({
+        message: "Only employers can download resumes",
+      });
+    }
+
+    const application = await Application.findById(
+      req.params.applicationId
+    ).populate("job");
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found",
+      });
+    }
+
+    // Make sure this application belongs to the employer's job
+    if (
+      application.job.employer.toString() !==
+      req.user.userId
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to download this resume",
+      });
+    }
+
+    if (!application.resume) {
+      return res.status(404).json({
+        message: "Resume not found",
+      });
+    }
+
+    const response = await fetch(application.resume);
+
+    if (!response.ok) {
+      return res.status(500).json({
+        message: "Failed to fetch resume",
+      });
+    }
+
+    const buffer = Buffer.from(
+      await response.arrayBuffer()
+    );
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="resume.pdf"'
+    );
+
+    res.send(buffer);
+  } catch (error) {
+    console.error("Download resume error:", error);
+
+    res.status(500).json({
+      message: "Failed to download resume",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   applyForJob,
   getMyApplications,
   getJobApplicants,
   updateApplicationStatus,
+  viewResume,
+  downloadResume,
 };
