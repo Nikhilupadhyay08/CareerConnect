@@ -52,4 +52,10 @@ const jobSchema = new mongoose.Schema(
   }
 );
 
+// MongoDB indexes for faster job queries
+jobSchema.index({ createdAt: -1 });
+jobSchema.index({ jobType: 1, createdAt: -1 });
+jobSchema.index({ location: 1, createdAt: -1 });
+jobSchema.index({ employer: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Job", jobSchema);

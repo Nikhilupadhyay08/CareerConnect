@@ -81,7 +81,7 @@ export const updateMyProfile = async (token, userData) => {
   return handleResponse(response, "Failed to update profile");
 };
 
-// Get all jobs
+// Get all jobs with search, filters, sorting and pagination
 export const getAllJobs = async (filters = {}) => {
   const queryParams = new URLSearchParams();
 
@@ -95,6 +95,18 @@ export const getAllJobs = async (filters = {}) => {
 
   if (filters.jobType) {
     queryParams.append("jobType", filters.jobType);
+  }
+
+  if (filters.sort) {
+    queryParams.append("sort", filters.sort);
+  }
+
+  if (filters.page) {
+    queryParams.append("page", filters.page);
+  }
+
+  if (filters.limit) {
+    queryParams.append("limit", filters.limit);
   }
 
   const queryString = queryParams.toString();

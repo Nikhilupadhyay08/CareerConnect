@@ -9,20 +9,48 @@ function Jobs() {
     search: "",
     location: "",
     jobType: "",
+    sort: "newest",
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [pagination, setPagination] = useState({
+    totalJobs: 0,
+    totalPages: 1,
+    jobsPerPage: 6,
+    hasNextPage: false,
+    hasPreviousPage: false,
   });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const JOBS_PER_PAGE = 6;
+
   // Fetch jobs
-  const fetchJobs = async (currentFilters = filters) => {
+  const fetchJobs = async (
+    currentFilters = filters,
+    page = currentPage
+  ) => {
     try {
       setLoading(true);
       setError("");
 
-      const data = await getAllJobs(currentFilters);
+      const data = await getAllJobs({
+        ...currentFilters,
+        page,
+        limit: JOBS_PER_PAGE,
+      });
 
       setJobs(data.jobs);
+
+      setPagination({
+        totalJobs: data.totalJobs,
+        totalPages: data.totalPages,
+        jobsPerPage: data.jobsPerPage,
+        hasNextPage: data.hasNextPage,
+        hasPreviousPage: data.hasPreviousPage,
+      });
     } catch (error) {
       setError(error.message);
     } finally {
@@ -30,9 +58,19 @@ function Jobs() {
     }
   };
 
-  // Load all jobs when page opens
+  // Load jobs when page opens
   useEffect(() => {
-    fetchJobs();
+    const defaultFilters = {
+      search: "",
+      location: "",
+      jobType: "",
+      sort: "newest",
+    };
+
+    setFilters(defaultFilters);
+    setCurrentPage(1);
+
+    fetchJobs(defaultFilters, 1);
   }, []);
 
   // Handle filter input changes
@@ -47,7 +85,9 @@ function Jobs() {
   const handleSearch = (event) => {
     event.preventDefault();
 
-    fetchJobs(filters);
+    setCurrentPage(1);
+
+    fetchJobs(filters, 1);
   };
 
   // Clear all filters
@@ -56,11 +96,30 @@ function Jobs() {
       search: "",
       location: "",
       jobType: "",
+      sort: "newest",
     };
 
     setFilters(emptyFilters);
+    setCurrentPage(1);
 
-    fetchJobs(emptyFilters);
+    fetchJobs(emptyFilters, 1);
+  };
+
+  // Change page
+  const handlePageChange = (page) => {
+    if (page < 1 || page > pagination.totalPages) {
+      return;
+    }
+
+    setCurrentPage(page);
+
+    fetchJobs(filters, page);
+
+    // Scroll back to job results
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -89,7 +148,9 @@ function Jobs() {
         >
           {/* Search */}
           <div className="search-field search-main">
-            <label htmlFor="search">Search</label>
+            <label htmlFor="search">
+              Search
+            </label>
 
             <input
               id="search"
@@ -103,7 +164,9 @@ function Jobs() {
 
           {/* Location */}
           <div className="search-field">
-            <label htmlFor="location">Location</label>
+            <label htmlFor="location">
+              Location
+            </label>
 
             <input
               id="location"
@@ -117,7 +180,9 @@ function Jobs() {
 
           {/* Job Type */}
           <div className="search-field">
-            <label htmlFor="jobType">Job Type</label>
+            <label htmlFor="jobType">
+              Job Type
+            </label>
 
             <select
               id="jobType"
@@ -125,11 +190,47 @@ function Jobs() {
               value={filters.jobType}
               onChange={handleChange}
             >
-              <option value="">All Job Types</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Internship">Internship</option>
-              <option value="Contract">Contract</option>
+              <option value="">
+                All Job Types
+              </option>
+
+              <option value="Full-time">
+                Full-time
+              </option>
+
+              <option value="Part-time">
+                Part-time
+              </option>
+
+              <option value="Internship">
+                Internship
+              </option>
+
+              <option value="Contract">
+                Contract
+              </option>
+            </select>
+          </div>
+
+          {/* Sort */}
+          <div className="search-field">
+            <label htmlFor="sort">
+              Sort By
+            </label>
+
+            <select
+              id="sort"
+              name="sort"
+              value={filters.sort}
+              onChange={handleChange}
+            >
+              <option value="newest">
+                Newest
+              </option>
+
+              <option value="oldest">
+                Oldest
+              </option>
             </select>
           </div>
 
@@ -157,12 +258,17 @@ function Jobs() {
       <section className="jobs-results">
         <div className="jobs-results-header">
           <div>
-            <h2>Available Jobs</h2>
+            <h2>
+              Available Jobs
+            </h2>
 
             {!loading && !error && (
               <p>
-                {jobs.length}{" "}
-                {jobs.length === 1 ? "job" : "jobs"} found
+                {pagination.totalJobs}{" "}
+                {pagination.totalJobs === 1
+                  ? "job"
+                  : "jobs"}{" "}
+                found
               </p>
             )}
           </div>
@@ -173,16 +279,23 @@ function Jobs() {
           <div className="jobs-message">
             <div className="loading-spinner"></div>
 
-            <p>Loading jobs...</p>
+            <p>
+              Loading jobs...
+            </p>
           </div>
         ) : error ? (
           /* Error */
           <div className="jobs-message error-message">
-            <h3>Something went wrong</h3>
+            <h3>
+              Something went wrong
+            </h3>
 
-            <p>{error}</p>
+            <p>
+              {error}
+            </p>
 
             <button
+              type="button"
               onClick={() => fetchJobs()}
               className="primary-button"
             >
@@ -192,89 +305,146 @@ function Jobs() {
         ) : jobs.length === 0 ? (
           /* No Jobs */
           <div className="jobs-message">
-            <div className="empty-icon">🔎</div>
+            <div className="empty-icon">
+              🔎
+            </div>
 
-            <h3>No jobs found</h3>
+            <h3>
+              No jobs found
+            </h3>
 
             <p>
               Try changing your search or filter criteria.
             </p>
           </div>
         ) : (
-          /* Job Cards */
-          <div className="job-grid">
-            {jobs.map((job) => (
-              <article
-                className="job-card"
-                key={job._id}
-              >
-                {/* Card Top */}
-                <div className="job-card-top">
-                  <div className="company-icon">
-                    {job.company
-                      ? job.company.charAt(0).toUpperCase()
-                      : "C"}
+          <>
+            {/* Job Cards */}
+            <div className="job-grid">
+              {jobs.map((job) => (
+                <article
+                  className="job-card"
+                  key={job._id}
+                >
+                  {/* Card Top */}
+                  <div className="job-card-top">
+                    <div className="company-icon">
+                      {job.company
+                        ? job.company
+                            .charAt(0)
+                            .toUpperCase()
+                        : "C"}
+                    </div>
+
+                    <span className="job-type-badge">
+                      {job.jobType}
+                    </span>
                   </div>
 
-                  <span className="job-type-badge">
-                    {job.jobType}
-                  </span>
+                  {/* Job Title */}
+                  <h3>
+                    {job.title}
+                  </h3>
+
+                  {/* Company */}
+                  <p className="job-company">
+                    {job.company}
+                  </p>
+
+                  {/* Job Meta */}
+                  <div className="job-meta">
+                    <span>
+                      📍 {job.location}
+                    </span>
+
+                    <span>
+                      💰 {job.salary}
+                    </span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="job-description">
+                    {job.description}
+                  </p>
+
+                  {/* Requirements */}
+                  {job.requirements &&
+                    job.requirements.length > 0 && (
+                      <div className="job-skills">
+                        {job.requirements
+                          .slice(0, 3)
+                          .map(
+                            (
+                              requirement,
+                              index
+                            ) => (
+                              <span
+                                key={index}
+                              >
+                                {requirement}
+                              </span>
+                            )
+                          )}
+                      </div>
+                    )}
+
+                  {/* Card Footer */}
+                  <div className="job-card-footer">
+                    <span className="job-posted">
+                      Posted recently
+                    </span>
+
+                    <Link
+                      to={`/jobs/${job._id}`}
+                      className="view-job-button"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="jobs-pagination">
+                <button
+                  type="button"
+                  className="pagination-button"
+                  disabled={
+                    !pagination.hasPreviousPage
+                  }
+                  onClick={() =>
+                    handlePageChange(
+                      currentPage - 1
+                    )
+                  }
+                >
+                  ← Previous
+                </button>
+
+                <div className="pagination-info">
+                  Page {currentPage} of{" "}
+                  {pagination.totalPages}
                 </div>
 
-                {/* Job Title */}
-                <h3>{job.title}</h3>
-
-                {/* Company */}
-                <p className="job-company">
-                  {job.company}
-                </p>
-
-                {/* Job Meta */}
-                <div className="job-meta">
-                  <span>
-                    📍 {job.location}
-                  </span>
-
-                  <span>
-                    💰 {job.salary}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p className="job-description">
-                  {job.description}
-                </p>
-
-                {/* Requirements */}
-                {job.requirements &&
-                  job.requirements.length > 0 && (
-                    <div className="job-skills">
-                      {job.requirements
-                        .slice(0, 3)
-                        .map((requirement, index) => (
-                          <span key={index}>
-                            {requirement}
-                          </span>
-                        ))}
-                    </div>
-                  )}
-
-                {/* Card Footer */}
-                <div className="job-card-footer">
-                  <span className="job-posted">
-                    Posted recently
-                  </span>
-
-                  <Link
-                    to={`/jobs/${job._id}`}
-                    className="view-job-button"
-                  >
-                    View Details →
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  disabled={
+                    !pagination.hasNextPage
+                  }
+                  onClick={() =>
+                    handlePageChange(
+                      currentPage + 1
+                    )
+                  }
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
     </main>

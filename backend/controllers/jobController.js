@@ -43,24 +43,44 @@ const createJob = async (req, res) => {
   }
 };
 
-// Get all jobs with search and filters
+// Get all jobs with search, filters, sorting and pagination
 const getAllJobs = async (req, res) => {
   try {
-    const { search, location, jobType } = req.query;
+    const {
+      search,
+      location,
+      jobType,
+      sort = "newest",
+      page = 1,
+      limit = 10,
+    } = req.query;
 
     const filter = {};
 
     // Search by job title or company
     if (search) {
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { company: { $regex: search, $options: "i" } },
+        {
+          title: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          company: {
+            $regex: search,
+            $options: "i",
+          },
+        },
       ];
     }
 
     // Filter by location
     if (location) {
-      filter.location = { $regex: location, $options: "i" };
+      filter.location = {
+        $regex: location,
+        $options: "i",
+      };
     }
 
     // Filter by job type
@@ -68,12 +88,60 @@ const getAllJobs = async (req, res) => {
       filter.jobType = jobType;
     }
 
+    // Pagination
+    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+    const jobsPerPage = Math.min(
+      Math.max(parseInt(limit, 10) || 10, 1),
+      50
+    );
+
+    const skip = (currentPage - 1) * jobsPerPage;
+
+    // Sorting
+    let sortOption = {
+      createdAt: -1,
+    };
+
+    if (sort === "oldest") {
+      sortOption = {
+        createdAt: 1,
+      };
+    }
+
+    if (sort === "salary-high") {
+      sortOption = {
+        salary: -1,
+      };
+    }
+
+    if (sort === "salary-low") {
+      sortOption = {
+        salary: 1,
+      };
+    }
+
+    // Get total number of matching jobs
+    const totalJobs = await Job.countDocuments(filter);
+
+    // Get paginated jobs
     const jobs = await Job.find(filter)
       .populate("employer", "name email")
-      .sort({ createdAt: -1 });
+      .sort(sortOption)
+      .skip(skip)
+      .limit(jobsPerPage);
+
+    const totalPages = Math.ceil(
+      totalJobs / jobsPerPage
+    );
 
     res.json({
       count: jobs.length,
+      totalJobs,
+      currentPage,
+      totalPages,
+      jobsPerPage,
+      hasNextPage: currentPage < totalPages,
+      hasPreviousPage: currentPage > 1,
       jobs,
     });
   } catch (error) {
