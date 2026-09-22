@@ -4,19 +4,32 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Public Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 
+// Job Seeker
 import JobSeekerDashboard from "./pages/JobSeekerDashboard";
 
+// Employer
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
 import Applicants from "./pages/Applicants";
 
+// Admin
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminUserDetails from "./pages/AdminUserDetails";
+import AdminJobs from "./pages/AdminJobs";
+import AdminJobDetails from "./pages/AdminJobDetails";
+import AdminApplications from "./pages/AdminApplications";
+import AdminApplicationDetails from "./pages/AdminApplicationDetails";
+
+// Profile
 import Profile from "./pages/Profile";
 
 function App() {
@@ -25,6 +38,9 @@ function App() {
       <Navbar />
 
       <Routes>
+
+        {/* ==================== PUBLIC ==================== */}
+
         {/* Home */}
         <Route path="/" element={<Home />} />
 
@@ -32,11 +48,16 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Jobs */}
+        {/* Public Jobs */}
         <Route path="/jobs" element={<Jobs />} />
-        <Route path="/jobs/:id" element={<JobDetails />} />
+        <Route
+          path="/jobs/:id"
+          element={<JobDetails />}
+        />
 
-        {/* Job Seeker Dashboard */}
+
+        {/* ==================== JOB SEEKER ==================== */}
+
         <Route
           path="/jobseeker/dashboard"
           element={
@@ -45,6 +66,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        {/* ==================== EMPLOYER ==================== */}
 
         {/* Employer Dashboard */}
         <Route
@@ -86,7 +110,82 @@ function App() {
           }
         />
 
-        {/* Profile */}
+
+        {/* ==================== ADMIN ==================== */}
+
+        {/* Admin Dashboard */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Users */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin User Details */}
+        <Route
+          path="/admin/users/:id"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminUserDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Jobs */}
+        <Route
+          path="/admin/jobs"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminJobs />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Job Details */}
+        <Route
+          path="/admin/jobs/:id"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminJobDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Applications */}
+        <Route
+          path="/admin/applications"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminApplications />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Application Details */}
+        <Route
+          path="/admin/applications/:id"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminApplicationDetails />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ==================== PROFILE ==================== */}
+
         <Route
           path="/profile"
           element={
@@ -95,6 +194,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
 
       <Footer />

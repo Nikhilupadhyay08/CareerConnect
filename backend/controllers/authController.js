@@ -79,6 +79,9 @@ const registerUser = async (req, res) => {
 // Login user
 const loginUser = async (req, res) => {
   try {
+    console.log("LOGIN EMAIL:", req.body.email);
+    console.log("PASSWORD RECEIVED:", !!req.body.password);
+
     const { email, password } = req.body;
 
     // Validate required fields

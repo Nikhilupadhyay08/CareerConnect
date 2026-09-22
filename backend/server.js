@@ -14,6 +14,8 @@ const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+
 const protect = require("./middleware/authMiddleware");
 
 const app = express();
@@ -71,6 +73,9 @@ app.use("/api/jobs", jobRoutes);
 
 // Application routes
 app.use("/api/applications", applicationRoutes);
+
+// Admin routes
+app.use("/api/admin", adminRoutes);
 
 // Port
 const PORT = process.env.PORT || 4000;

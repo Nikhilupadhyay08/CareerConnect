@@ -5,7 +5,9 @@ const User = require("../models/User");
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
 const sendEmail = require("../utils/mail");
 
+// ============================================================
 // Apply for a job
+// ============================================================
 const applyForJob = async (req, res) => {
   try {
     // Only job seekers can apply
@@ -55,7 +57,9 @@ const applyForJob = async (req, res) => {
     }
 
     // Upload resume to Cloudinary
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
+    const uploadResult = await uploadToCloudinary(
+      req.file.buffer
+    );
 
     // Create application
     const application = await Application.create({
@@ -149,7 +153,9 @@ CareerConnect Team`,
   }
 };
 
+// ============================================================
 // Get applications of the logged-in job seeker
+// ============================================================
 const getMyApplications = async (req, res) => {
   try {
     if (req.user.role !== "jobseeker") {
@@ -176,9 +182,12 @@ const getMyApplications = async (req, res) => {
   }
 };
 
+// ============================================================
 // Get applicants for an employer's job
+// ============================================================
 const getJobApplicants = async (req, res) => {
   try {
+    // Only employers can view applicants
     if (req.user.role !== "employer") {
       return res.status(403).json({
         message: "Only employers can view applicants",
@@ -196,7 +205,8 @@ const getJobApplicants = async (req, res) => {
     // Make sure this job belongs to the logged-in employer
     if (job.employer.toString() !== req.user.userId) {
       return res.status(403).json({
-        message: "You are not authorized to view these applicants",
+        message:
+          "You are not authorized to view these applicants",
       });
     }
 
@@ -219,13 +229,16 @@ const getJobApplicants = async (req, res) => {
   }
 };
 
+// ============================================================
 // Update application status
+// ============================================================
 const updateApplicationStatus = async (req, res) => {
   try {
     // Only employers can update status
     if (req.user.role !== "employer") {
       return res.status(403).json({
-        message: "Only employers can update application status",
+        message:
+          "Only employers can update application status",
       });
     }
 
@@ -257,9 +270,19 @@ const updateApplicationStatus = async (req, res) => {
     }
 
     // Make sure the application belongs to the employer's job
-    if (application.job.employer.toString() !== req.user.userId) {
+    if (!application.job) {
+      return res.status(404).json({
+        message: "The job associated with this application no longer exists",
+      });
+    }
+
+    if (
+      application.job.employer.toString() !==
+      req.user.userId
+    ) {
       return res.status(403).json({
-        message: "You are not authorized to update this application",
+        message:
+          "You are not authorized to update this application",
       });
     }
 
@@ -280,12 +303,21 @@ const updateApplicationStatus = async (req, res) => {
   }
 };
 
+// ============================================================
 // View resume in browser
+// Employers can view resumes for their own jobs.
+// Admins can view all resumes.
+// ============================================================
 const viewResume = async (req, res) => {
   try {
-    if (req.user.role !== "employer") {
+    // Only employers and admins can view resumes
+    if (
+      req.user.role !== "employer" &&
+      req.user.role !== "admin"
+    ) {
       return res.status(403).json({
-        message: "Only employers can view resumes",
+        message:
+          "Only employers and admins can view resumes",
       });
     }
 
@@ -299,22 +331,36 @@ const viewResume = async (req, res) => {
       });
     }
 
-    // Make sure this application belongs to the employer's job
-    if (
-      application.job.employer.toString() !==
-      req.user.userId
-    ) {
-      return res.status(403).json({
-        message: "You are not authorized to view this resume",
-      });
-    }
-
+    // Resume cannot be accessed if it doesn't exist
     if (!application.resume) {
       return res.status(404).json({
         message: "Resume not found",
       });
     }
 
+    // If the user is an employer, make sure the job belongs
+    // to that employer.
+    // Admins can view resumes from all jobs.
+    if (req.user.role === "employer") {
+      if (!application.job) {
+        return res.status(404).json({
+          message:
+            "The job associated with this application no longer exists",
+        });
+      }
+
+      if (
+        application.job.employer.toString() !==
+        req.user.userId
+      ) {
+        return res.status(403).json({
+          message:
+            "You are not authorized to view this resume",
+        });
+      }
+    }
+
+    // Fetch resume from Cloudinary
     const response = await fetch(application.resume);
 
     if (!response.ok) {
@@ -328,6 +374,7 @@ const viewResume = async (req, res) => {
     );
 
     res.setHeader("Content-Type", "application/pdf");
+
     res.setHeader(
       "Content-Disposition",
       'inline; filename="resume.pdf"'
@@ -344,12 +391,21 @@ const viewResume = async (req, res) => {
   }
 };
 
+// ============================================================
 // Download resume
+// Employers can download resumes for their own jobs.
+// Admins can download all resumes.
+// ============================================================
 const downloadResume = async (req, res) => {
   try {
-    if (req.user.role !== "employer") {
+    // Only employers and admins can download resumes
+    if (
+      req.user.role !== "employer" &&
+      req.user.role !== "admin"
+    ) {
       return res.status(403).json({
-        message: "Only employers can download resumes",
+        message:
+          "Only employers and admins can download resumes",
       });
     }
 
@@ -363,22 +419,36 @@ const downloadResume = async (req, res) => {
       });
     }
 
-    // Make sure this application belongs to the employer's job
-    if (
-      application.job.employer.toString() !==
-      req.user.userId
-    ) {
-      return res.status(403).json({
-        message: "You are not authorized to download this resume",
-      });
-    }
-
+    // Resume cannot be downloaded if it doesn't exist
     if (!application.resume) {
       return res.status(404).json({
         message: "Resume not found",
       });
     }
 
+    // If the user is an employer, make sure the job belongs
+    // to that employer.
+    // Admins can download resumes from all jobs.
+    if (req.user.role === "employer") {
+      if (!application.job) {
+        return res.status(404).json({
+          message:
+            "The job associated with this application no longer exists",
+        });
+      }
+
+      if (
+        application.job.employer.toString() !==
+        req.user.userId
+      ) {
+        return res.status(403).json({
+          message:
+            "You are not authorized to download this resume",
+        });
+      }
+    }
+
+    // Fetch resume from Cloudinary
     const response = await fetch(application.resume);
 
     if (!response.ok) {
@@ -392,6 +462,7 @@ const downloadResume = async (req, res) => {
     );
 
     res.setHeader("Content-Type", "application/pdf");
+
     res.setHeader(
       "Content-Disposition",
       'attachment; filename="resume.pdf"'
@@ -408,6 +479,9 @@ const downloadResume = async (req, res) => {
   }
 };
 
+// ============================================================
+// Exports
+// ============================================================
 module.exports = {
   applyForJob,
   getMyApplications,

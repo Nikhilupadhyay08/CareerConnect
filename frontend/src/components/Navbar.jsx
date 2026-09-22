@@ -19,9 +19,11 @@ function Navbar() {
             Home
           </Link>
 
-          <Link to="/jobs" className="nav-link">
-            Jobs
-          </Link>
+          {user?.role !== "admin" && (
+            <Link to="/jobs" className="nav-link">
+              Jobs
+            </Link>
+          )}
 
           {!isAuthenticated ? (
             <>
@@ -52,6 +54,42 @@ function Navbar() {
                   Dashboard
                 </Link>
               )}
+              
+              {user?.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="nav-link"
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              {user?.role === "admin" && (
+                <Link
+                  to="/admin/users"
+                  className="nav-link"
+                >
+                  Users
+                </Link>
+              )}
+
+              {user?.role === "admin" && (
+                <Link
+                  to="/admin/jobs"
+                  className="nav-link"
+                >
+                  Jobs
+                </Link>
+              )}
+
+              {user?.role === "admin" && (
+              <Link
+                to="/admin/applications"
+                className="nav-link"
+              >
+                Applications
+              </Link>
+            )}
 
               <Link to="/profile" className="nav-link">
                 Profile
