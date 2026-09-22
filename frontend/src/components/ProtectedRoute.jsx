@@ -5,30 +5,37 @@ function ProtectedRoute({ children, allowedRole }) {
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // User is not logged in
+  // User is not authenticated
   if (!isAuthenticated || !user) {
     return (
       <Navigate
         to="/login"
         replace
-        state={{ from: location.pathname }}
+        state={{
+          from: location.pathname,
+        }}
       />
     );
   }
 
-  // User is logged in but has the wrong role
+  // User is authenticated but does not have the required role
   if (allowedRole && user.role !== allowedRole) {
-    if (user.role === "employer") {
-      return <Navigate to="/employer/dashboard" replace />;
-    }
+    switch (user.role) {
+      case "admin":
+        return <Navigate to="/admin" replace />;
 
-    if (user.role === "jobseeker") {
-      return <Navigate to="/jobseeker/dashboard" replace />;
-    }
+      case "employer":
+        return <Navigate to="/employer/dashboard" replace />;
 
-    return <Navigate to="/" replace />;
+      case "jobseeker":
+        return <Navigate to="/jobseeker/dashboard" replace />;
+
+      default:
+        return <Navigate to="/" replace />;
+    }
   }
 
+  // User is authenticated and has the correct role
   return children;
 }
 

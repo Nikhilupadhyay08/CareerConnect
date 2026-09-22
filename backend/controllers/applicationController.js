@@ -310,14 +310,14 @@ const updateApplicationStatus = async (req, res) => {
 // ============================================================
 const viewResume = async (req, res) => {
   try {
-    // Only employers and admins can view resumes
+    // Employers, admins, and the applicant can view resumes
     if (
       req.user.role !== "employer" &&
-      req.user.role !== "admin"
+      req.user.role !== "admin" &&
+      req.user.role !== "jobseeker"
     ) {
       return res.status(403).json({
-        message:
-          "Only employers and admins can view resumes",
+        message: "You are not authorized to view this resume",
       });
     }
 
@@ -336,6 +336,19 @@ const viewResume = async (req, res) => {
       return res.status(404).json({
         message: "Resume not found",
       });
+    }
+
+    // Job seekers can only view their own resume
+    if (req.user.role === "jobseeker") {
+      if (
+        application.applicant.toString() !==
+        req.user.userId
+      ) {
+        return res.status(403).json({
+          message:
+            "You are not authorized to view this resume",
+        });
+      }
     }
 
     // If the user is an employer, make sure the job belongs

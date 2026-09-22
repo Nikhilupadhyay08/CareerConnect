@@ -35,171 +35,214 @@ import Profile from "./pages/Profile";
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      <div style={styles.app}>
+        {/* Navigation */}
+        <Navbar />
 
-      <Routes>
+        {/* Main Content */}
+        <main style={styles.main}>
+          <Routes>
+            {/* ==================== PUBLIC ==================== */}
 
-        {/* ==================== PUBLIC ==================== */}
+            <Route path="/" element={<Home />} />
 
-        {/* Home */}
-        <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
 
-        {/* Authentication */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<Register />} />
 
-        {/* Public Jobs */}
-        <Route path="/jobs" element={<Jobs />} />
-        <Route
-          path="/jobs/:id"
-          element={<JobDetails />}
-        />
+            <Route path="/jobs" element={<Jobs />} />
 
+            <Route
+              path="/jobs/:id"
+              element={<JobDetails />}
+            />
 
-        {/* ==================== JOB SEEKER ==================== */}
+            {/* ==================== JOB SEEKER ==================== */}
 
-        <Route
-          path="/jobseeker/dashboard"
-          element={
-            <ProtectedRoute allowedRole="jobseeker">
-              <JobSeekerDashboard />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/jobseeker/dashboard"
+              element={
+                <ProtectedRoute allowedRole="jobseeker">
+                  <JobSeekerDashboard />
+                </ProtectedRoute>
+              }
+            />
 
+            {/* ==================== EMPLOYER ==================== */}
 
-        {/* ==================== EMPLOYER ==================== */}
+            <Route
+              path="/employer/dashboard"
+              element={
+                <ProtectedRoute allowedRole="employer">
+                  <EmployerDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Employer Dashboard */}
-        <Route
-          path="/employer/dashboard"
-          element={
-            <ProtectedRoute allowedRole="employer">
-              <EmployerDashboard />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/employer/create-job"
+              element={
+                <ProtectedRoute allowedRole="employer">
+                  <CreateJob />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Create Job */}
-        <Route
-          path="/employer/create-job"
-          element={
-            <ProtectedRoute allowedRole="employer">
-              <CreateJob />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/employer/edit-job/:id"
+              element={
+                <ProtectedRoute allowedRole="employer">
+                  <EditJob />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Edit Job */}
-        <Route
-          path="/employer/edit-job/:id"
-          element={
-            <ProtectedRoute allowedRole="employer">
-              <EditJob />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/employer/job/:jobId/applicants"
+              element={
+                <ProtectedRoute allowedRole="employer">
+                  <Applicants />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Applicants */}
-        <Route
-          path="/employer/job/:jobId/applicants"
-          element={
-            <ProtectedRoute allowedRole="employer">
-              <Applicants />
-            </ProtectedRoute>
-          }
-        />
+            {/* ==================== ADMIN ==================== */}
 
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* ==================== ADMIN ==================== */}
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin Dashboard */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/admin/users/:id"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminUserDetails />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin Users */}
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/admin/jobs"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminJobs />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin User Details */}
-        <Route
-          path="/admin/users/:id"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminUserDetails />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/admin/jobs/:id"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminJobDetails />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin Jobs */}
-        <Route
-          path="/admin/jobs"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminJobs />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/admin/applications"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminApplications />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin Job Details */}
-        <Route
-          path="/admin/jobs/:id"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminJobDetails />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/admin/applications/:id"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <AdminApplicationDetails />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Admin Applications */}
-        <Route
-          path="/admin/applications"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminApplications />
-            </ProtectedRoute>
-          }
-        />
+            {/* ==================== PROFILE ==================== */}
 
-        {/* Admin Application Details */}
-        <Route
-          path="/admin/applications/:id"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminApplicationDetails />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
+            {/* ==================== 404 ==================== */}
 
-        {/* ==================== PROFILE ==================== */}
+            <Route
+              path="*"
+              element={
+                <div style={styles.notFound}>
+                  <h1 style={styles.notFoundTitle}>404</h1>
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+                  <p style={styles.notFoundText}>
+                    Page not found.
+                  </p>
+                </div>
+              }
+            />
+          </Routes>
+        </main>
 
-      </Routes>
-
-      <Footer />
+        {/* Footer */}
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }
+
+const styles = {
+  app: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    background: "#f8fafc",
+  },
+
+  main: {
+    flex: 1,
+    width: "100%",
+  },
+
+  notFound: {
+    minHeight: "60vh",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "40px 20px",
+  },
+
+  notFoundTitle: {
+    margin: 0,
+    fontSize: "72px",
+    fontWeight: "800",
+    color: "#0f172a",
+    lineHeight: 1,
+  },
+
+  notFoundText: {
+    marginTop: "14px",
+    marginBottom: 0,
+    fontSize: "16px",
+    color: "#64748b",
+  },
+};
 
 export default App;

@@ -1,6 +1,9 @@
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000/api";
-// Handle API responses
+
+// ==================== HELPERS ====================
+
+// Handle standard API responses
 const handleResponse = async (response, defaultMessage) => {
   let data = {};
 
@@ -29,6 +32,14 @@ const handleResponse = async (response, defaultMessage) => {
   return data;
 };
 
+// Authorization headers
+const authHeaders = (token) => ({
+  Authorization: `Bearer ${token}`,
+});
+
+
+// ==================== AUTH ====================
+
 // Register user
 export const registerUser = async (userData) => {
   const response = await fetch(`${API_URL}/auth/register`, {
@@ -55,13 +66,14 @@ export const loginUser = async (loginData) => {
   return handleResponse(response, "Login failed");
 };
 
+
+// ==================== PROFILE ====================
+
 // Get logged-in user's profile
 export const getMyProfile = async (token) => {
   const response = await fetch(`${API_URL}/auth/profile`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: authHeaders(token),
   });
 
   return handleResponse(response, "Failed to fetch profile");
@@ -73,13 +85,16 @@ export const updateMyProfile = async (token, userData) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...authHeaders(token),
     },
     body: JSON.stringify(userData),
   });
 
   return handleResponse(response, "Failed to update profile");
 };
+
+
+// ==================== JOBS ====================
 
 // Get all jobs with search, filters, sorting and pagination
 export const getAllJobs = async (filters = {}) => {
@@ -120,65 +135,107 @@ export const getAllJobs = async (filters = {}) => {
 
 // Get a single job
 export const getJobById = async (jobId) => {
-  const response = await fetch(`${API_URL}/jobs/${jobId}`);
+  const response = await fetch(
+    `${API_URL}/jobs/${jobId}`
+  );
 
   return handleResponse(response, "Failed to fetch job");
 };
 
-// Update an existing job
-export const updateJob = async (token, jobId, jobData) => {
-  const response = await fetch(`${API_URL}/jobs/${jobId}`, {
-    method: "PATCH",
+// Create a new job
+export const createJob = async (token, jobData) => {
+  const response = await fetch(`${API_URL}/jobs`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...authHeaders(token),
     },
     body: JSON.stringify(jobData),
   });
+
+  return handleResponse(response, "Failed to create job");
+};
+
+// Update an existing job
+export const updateJob = async (
+  token,
+  jobId,
+  jobData
+) => {
+  const response = await fetch(
+    `${API_URL}/jobs/${jobId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(token),
+      },
+      body: JSON.stringify(jobData),
+    }
+  );
 
   return handleResponse(response, "Failed to update job");
 };
 
 // Get jobs posted by logged-in employer
 export const getMyJobs = async (token) => {
-  const response = await fetch(`${API_URL}/jobs/my-jobs`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_URL}/jobs/my-jobs`,
+    {
+      method: "GET",
+      headers: authHeaders(token),
+    }
+  );
 
-  return handleResponse(response, "Failed to fetch your jobs");
+  return handleResponse(
+    response,
+    "Failed to fetch your jobs"
+  );
 };
 
 // Delete a job
 export const deleteJob = async (token, jobId) => {
-  const response = await fetch(`${API_URL}/jobs/${jobId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_URL}/jobs/${jobId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }
+  );
 
-  return handleResponse(response, "Failed to delete job");
+  return handleResponse(
+    response,
+    "Failed to delete job"
+  );
 };
 
+
+// ==================== APPLICATIONS ====================
+
 // Apply for a job
-export const applyForJob = async (token, jobId, resumeFile) => {
+export const applyForJob = async (
+  token,
+  jobId,
+  resumeFile
+) => {
   const formData = new FormData();
 
   formData.append("jobId", jobId);
   formData.append("resume", resumeFile);
 
-  const response = await fetch(`${API_URL}/applications`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
+  const response = await fetch(
+    `${API_URL}/applications`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: formData,
+    }
+  );
 
-  return handleResponse(response, "Failed to apply for job");
+  return handleResponse(
+    response,
+    "Failed to apply for job"
+  );
 };
 
 // Get logged-in user's applications
@@ -187,9 +244,7 @@ export const getMyApplications = async (token) => {
     `${API_URL}/applications/my-applications`,
     {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: authHeaders(token),
     }
   );
 
@@ -199,29 +254,16 @@ export const getMyApplications = async (token) => {
   );
 };
 
-// Create a new job
-export const createJob = async (token, jobData) => {
-  const response = await fetch(`${API_URL}/jobs`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(jobData),
-  });
-
-  return handleResponse(response, "Failed to create job");
-};
-
 // Get applications for an employer's job
-export const getJobApplicants = async (token, jobId) => {
+export const getJobApplicants = async (
+  token,
+  jobId
+) => {
   const response = await fetch(
     `${API_URL}/applications/job/${jobId}`,
     {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: authHeaders(token),
     }
   );
 
@@ -229,6 +271,31 @@ export const getJobApplicants = async (token, jobId) => {
     response,
     "Failed to fetch applicants"
   );
+};
+
+// View application resume
+export const viewApplicationResume = async (
+  token,
+  applicationId
+) => {
+  const response = await fetch(
+    `${API_URL}/applications/${applicationId}/resume/view`,
+    {
+      headers: authHeaders(token),
+    }
+  );
+
+  if (!response.ok) {
+    const data = await response
+      .json()
+      .catch(() => ({}));
+
+    throw new Error(
+      data.message || "Failed to view resume"
+    );
+  }
+
+  return response.blob();
 };
 
 // Update application status
@@ -243,7 +310,7 @@ export const updateApplicationStatus = async (
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...authHeaders(token),
       },
       body: JSON.stringify({ status }),
     }

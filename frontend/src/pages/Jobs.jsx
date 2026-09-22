@@ -3,21 +3,25 @@ import { Link } from "react-router-dom";
 import { getAllJobs } from "../services/api";
 
 function Jobs() {
-  const [jobs, setJobs] = useState([]);
+  const JOBS_PER_PAGE = 6;
 
-  const [filters, setFilters] = useState({
+  const defaultFilters = {
     search: "",
     location: "",
     jobType: "",
     sort: "newest",
-  });
+  };
+
+  const [jobs, setJobs] = useState([]);
+
+  const [filters, setFilters] = useState(defaultFilters);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const [pagination, setPagination] = useState({
     totalJobs: 0,
     totalPages: 1,
-    jobsPerPage: 6,
+    jobsPerPage: JOBS_PER_PAGE,
     hasNextPage: false,
     hasPreviousPage: false,
   });
@@ -25,9 +29,8 @@ function Jobs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const JOBS_PER_PAGE = 6;
+  // ==================== FETCH JOBS ====================
 
-  // Fetch jobs
   const fetchJobs = async (
     currentFilters = filters,
     page = currentPage
@@ -42,335 +45,531 @@ function Jobs() {
         limit: JOBS_PER_PAGE,
       });
 
-      setJobs(data.jobs);
+      setJobs(data.jobs || []);
 
       setPagination({
-        totalJobs: data.totalJobs,
-        totalPages: data.totalPages,
-        jobsPerPage: data.jobsPerPage,
-        hasNextPage: data.hasNextPage,
-        hasPreviousPage: data.hasPreviousPage,
+        totalJobs: data.totalJobs || 0,
+        totalPages: data.totalPages || 1,
+        jobsPerPage:
+          data.jobsPerPage || JOBS_PER_PAGE,
+        hasNextPage: Boolean(data.hasNextPage),
+        hasPreviousPage: Boolean(
+          data.hasPreviousPage
+        ),
       });
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(
+        err.message ||
+          "Failed to load jobs. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Load jobs when page opens
+  // ==================== INITIAL LOAD ====================
+
   useEffect(() => {
-    const defaultFilters = {
-      search: "",
-      location: "",
-      jobType: "",
-      sort: "newest",
-    };
-
-    setFilters(defaultFilters);
-    setCurrentPage(1);
-
     fetchJobs(defaultFilters, 1);
   }, []);
 
-  // Handle filter input changes
+  // ==================== HANDLERS ====================
+
   const handleChange = (event) => {
-    setFilters({
-      ...filters,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+
+    setFilters((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setError("");
   };
 
-  // Search jobs
   const handleSearch = (event) => {
     event.preventDefault();
 
     setCurrentPage(1);
-
     fetchJobs(filters, 1);
   };
 
-  // Clear all filters
   const handleClear = () => {
-    const emptyFilters = {
-      search: "",
-      location: "",
-      jobType: "",
-      sort: "newest",
-    };
-
-    setFilters(emptyFilters);
+    setFilters(defaultFilters);
     setCurrentPage(1);
-
-    fetchJobs(emptyFilters, 1);
+    fetchJobs(defaultFilters, 1);
   };
 
-  // Change page
   const handlePageChange = (page) => {
-    if (page < 1 || page > pagination.totalPages) {
+    if (
+      page < 1 ||
+      page > pagination.totalPages
+    ) {
       return;
     }
 
     setCurrentPage(page);
-
     fetchJobs(filters, page);
 
-    // Scroll back to job results
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
 
+  // ==================== HELPERS ====================
+
+  const getCompanyInitial = (company) => {
+    if (!company) return "C";
+
+    return company
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+  };
+
+  const getJobTypeStyle = (jobType) => {
+    switch (jobType) {
+      case "Full-time":
+        return {
+          background: "#eff6ff",
+          color: "#1d4ed8",
+        };
+
+      case "Part-time":
+        return {
+          background: "#f5f3ff",
+          color: "#6d28d9",
+        };
+
+      case "Internship":
+        return {
+          background: "#ecfdf5",
+          color: "#047857",
+        };
+
+      case "Contract":
+        return {
+          background: "#fff7ed",
+          color: "#c2410c",
+        };
+
+      default:
+        return {
+          background: "#f1f5f9",
+          color: "#475569",
+        };
+    }
+  };
+
   return (
-    <main className="jobs-page">
-      {/* Page Header */}
-      <section className="jobs-header">
-        <div>
-          <span className="section-label">
+    <main style={styles.page}>
+      {/* Background Decorations */}
+      <div style={styles.backgroundShapeOne}></div>
+      <div style={styles.backgroundShapeTwo}></div>
+
+      {/* ==================== HERO ==================== */}
+
+      <section style={styles.hero}>
+        <div style={styles.heroContent}>
+          <div style={styles.eyebrow}>
             CAREERCONNECT JOBS
-          </span>
+          </div>
 
-          <h1>Find your next opportunity</h1>
+          <h1 style={styles.heading}>
+            Find the right
+            <br />
+            <span style={styles.headingHighlight}>
+              opportunity.
+            </span>
+          </h1>
 
-          <p>
-            Explore jobs from companies looking for talented people
-            like you.
+          <p style={styles.heroDescription}>
+            Discover jobs from companies looking for
+            talented people like you. Search, filter and
+            find your next career opportunity.
           </p>
+
+          <div style={styles.heroStats}>
+            <div style={styles.heroStat}>
+              <span style={styles.heroStatIcon}>
+                💼
+              </span>
+
+              <div>
+                <strong>Multiple</strong>
+                <span>Job Opportunities</span>
+              </div>
+            </div>
+
+            <div style={styles.heroStatDivider}></div>
+
+            <div style={styles.heroStat}>
+              <span style={styles.heroStatIcon}>
+                🔎
+              </span>
+
+              <div>
+                <strong>Smart Search</strong>
+                <span>Find relevant jobs</span>
+              </div>
+            </div>
+
+            <div style={styles.heroStatDivider}></div>
+
+            <div style={styles.heroStat}>
+              <span style={styles.heroStatIcon}>
+                🚀
+              </span>
+
+              <div>
+                <strong>Apply Easily</strong>
+                <span>Start your journey</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Search and Filters */}
-      <section className="jobs-search-section">
+      {/* ==================== SEARCH ==================== */}
+
+      <section style={styles.searchSection}>
         <form
-          className="jobs-search-form"
           onSubmit={handleSearch}
+          style={styles.searchCard}
         >
-          {/* Search */}
-          <div className="search-field search-main">
-            <label htmlFor="search">
-              Search
-            </label>
+          <div style={styles.searchHeader}>
+            <div>
+              <h2 style={styles.searchTitle}>
+                Search Jobs
+              </h2>
 
-            <input
-              id="search"
-              type="text"
-              name="search"
-              value={filters.search}
-              onChange={handleChange}
-              placeholder="Job title or company"
-            />
+              <p style={styles.searchSubtitle}>
+                Find opportunities matching your
+                preferences.
+              </p>
+            </div>
+
+            <span style={styles.searchIcon}>
+              🔎
+            </span>
           </div>
 
-          {/* Location */}
-          <div className="search-field">
-            <label htmlFor="location">
-              Location
-            </label>
+          <div style={styles.searchGrid}>
+            {/* Job Search */}
+            <div style={styles.searchField}>
+              <label
+                htmlFor="search"
+                style={styles.label}
+              >
+                Job Title or Company
+              </label>
 
-            <input
-              id="location"
-              type="text"
-              name="location"
-              value={filters.location}
-              onChange={handleChange}
-              placeholder="e.g. Remote, Delhi"
-            />
+              <div style={styles.inputWrapper}>
+                <span style={styles.inputIcon}>
+                  🔎
+                </span>
+
+                <input
+                  id="search"
+                  type="text"
+                  name="search"
+                  value={filters.search}
+                  onChange={handleChange}
+                  placeholder="e.g. Software Engineer"
+                  style={styles.input}
+                />
+              </div>
+            </div>
+
+            {/* Location */}
+            <div style={styles.searchField}>
+              <label
+                htmlFor="location"
+                style={styles.label}
+              >
+                Location
+              </label>
+
+              <div style={styles.inputWrapper}>
+                <span style={styles.inputIcon}>
+                  📍
+                </span>
+
+                <input
+                  id="location"
+                  type="text"
+                  name="location"
+                  value={filters.location}
+                  onChange={handleChange}
+                  placeholder="Remote, Delhi..."
+                  style={styles.input}
+                />
+              </div>
+            </div>
+
+            {/* Job Type */}
+            <div style={styles.searchField}>
+              <label
+                htmlFor="jobType"
+                style={styles.label}
+              >
+                Job Type
+              </label>
+
+              <select
+                id="jobType"
+                name="jobType"
+                value={filters.jobType}
+                onChange={handleChange}
+                style={styles.select}
+              >
+                <option value="">
+                  All Job Types
+                </option>
+
+                <option value="Full-time">
+                  Full-time
+                </option>
+
+                <option value="Part-time">
+                  Part-time
+                </option>
+
+                <option value="Internship">
+                  Internship
+                </option>
+
+                <option value="Contract">
+                  Contract
+                </option>
+              </select>
+            </div>
+
+            {/* Sort */}
+            <div style={styles.searchField}>
+              <label
+                htmlFor="sort"
+                style={styles.label}
+              >
+                Sort By
+              </label>
+
+              <select
+                id="sort"
+                name="sort"
+                value={filters.sort}
+                onChange={handleChange}
+                style={styles.select}
+              >
+                <option value="newest">
+                  Newest
+                </option>
+
+                <option value="oldest">
+                  Oldest
+                </option>
+              </select>
+            </div>
           </div>
 
-          {/* Job Type */}
-          <div className="search-field">
-            <label htmlFor="jobType">
-              Job Type
-            </label>
-
-            <select
-              id="jobType"
-              name="jobType"
-              value={filters.jobType}
-              onChange={handleChange}
-            >
-              <option value="">
-                All Job Types
-              </option>
-
-              <option value="Full-time">
-                Full-time
-              </option>
-
-              <option value="Part-time">
-                Part-time
-              </option>
-
-              <option value="Internship">
-                Internship
-              </option>
-
-              <option value="Contract">
-                Contract
-              </option>
-            </select>
-          </div>
-
-          {/* Sort */}
-          <div className="search-field">
-            <label htmlFor="sort">
-              Sort By
-            </label>
-
-            <select
-              id="sort"
-              name="sort"
-              value={filters.sort}
-              onChange={handleChange}
-            >
-              <option value="newest">
-                Newest
-              </option>
-
-              <option value="oldest">
-                Oldest
-              </option>
-            </select>
-          </div>
-
-          {/* Buttons */}
-          <div className="search-actions">
+          <div style={styles.searchActions}>
             <button
               type="submit"
-              className="primary-button"
+              style={styles.searchButton}
             >
+              <span>🔎</span>
               Search Jobs
             </button>
 
             <button
               type="button"
-              className="clear-button"
               onClick={handleClear}
+              style={styles.clearButton}
             >
-              Clear
+              Clear Filters
             </button>
           </div>
         </form>
       </section>
 
-      {/* Job Results */}
-      <section className="jobs-results">
-        <div className="jobs-results-header">
+      {/* ==================== RESULTS ==================== */}
+
+      <section style={styles.resultsSection}>
+        <div style={styles.resultsHeader}>
           <div>
-            <h2>
+            <div style={styles.resultsEyebrow}>
+              OPPORTUNITIES
+            </div>
+
+            <h2 style={styles.resultsTitle}>
               Available Jobs
             </h2>
 
             {!loading && !error && (
-              <p>
-                {pagination.totalJobs}{" "}
+              <p style={styles.resultsCount}>
+                Showing{" "}
+                <strong>
+                  {pagination.totalJobs}
+                </strong>{" "}
                 {pagination.totalJobs === 1
-                  ? "job"
-                  : "jobs"}{" "}
-                found
+                  ? "opportunity"
+                  : "opportunities"}
               </p>
             )}
           </div>
+
+          {!loading &&
+            !error &&
+            jobs.length > 0 && (
+              <div style={styles.resultBadge}>
+                {pagination.totalJobs} Jobs
+              </div>
+            )}
         </div>
 
-        {/* Loading */}
-        {loading ? (
-          <div className="jobs-message">
-            <div className="loading-spinner"></div>
+        {/* ==================== LOADING ==================== */}
 
-            <p>
+        {loading ? (
+          <div style={styles.messageBox}>
+            <div style={styles.spinner}></div>
+
+            <h3 style={styles.messageTitle}>
               Loading jobs...
+            </h3>
+
+            <p style={styles.messageText}>
+              Finding the latest opportunities for
+              you.
             </p>
           </div>
         ) : error ? (
-          /* Error */
-          <div className="jobs-message error-message">
-            <h3>
+          /* ==================== ERROR ==================== */
+
+          <div style={styles.messageBox}>
+            <div style={styles.messageIcon}>
+              ⚠️
+            </div>
+
+            <h3 style={styles.messageTitle}>
               Something went wrong
             </h3>
 
-            <p>
+            <p style={styles.messageText}>
               {error}
             </p>
 
             <button
               type="button"
-              onClick={() => fetchJobs()}
-              className="primary-button"
+              onClick={() =>
+                fetchJobs(filters, currentPage)
+              }
+              style={styles.primaryMessageButton}
             >
               Try Again
             </button>
           </div>
         ) : jobs.length === 0 ? (
-          /* No Jobs */
-          <div className="jobs-message">
-            <div className="empty-icon">
+          /* ==================== EMPTY ==================== */
+
+          <div style={styles.messageBox}>
+            <div style={styles.emptyIcon}>
               🔎
             </div>
 
-            <h3>
+            <h3 style={styles.messageTitle}>
               No jobs found
             </h3>
 
-            <p>
-              Try changing your search or filter criteria.
+            <p style={styles.messageText}>
+              We couldn't find any jobs matching
+              your current search and filters.
             </p>
+
+            <button
+              type="button"
+              onClick={handleClear}
+              style={styles.primaryMessageButton}
+            >
+              Clear Filters
+            </button>
           </div>
         ) : (
           <>
-            {/* Job Cards */}
-            <div className="job-grid">
-              {jobs.map((job) => (
-                <article
-                  className="job-card"
-                  key={job._id}
-                >
-                  {/* Card Top */}
-                  <div className="job-card-top">
-                    <div className="company-icon">
-                      {job.company
-                        ? job.company
-                            .charAt(0)
-                            .toUpperCase()
-                        : "C"}
+            {/* ==================== JOB GRID ==================== */}
+
+            <div style={styles.jobGrid}>
+              {jobs.map((job) => {
+                const jobTypeStyle =
+                  getJobTypeStyle(job.jobType);
+
+                return (
+                  <article
+                    key={job._id}
+                    style={styles.jobCard}
+                  >
+                    <div style={styles.cardHeader}>
+                      <div style={styles.companyIcon}>
+                        {getCompanyInitial(
+                          job.company
+                        )}
+                      </div>
+
+                      <span
+                        style={{
+                          ...styles.jobTypeBadge,
+                          background:
+                            jobTypeStyle.background,
+                          color:
+                            jobTypeStyle.color,
+                        }}
+                      >
+                        {job.jobType}
+                      </span>
                     </div>
 
-                    <span className="job-type-badge">
-                      {job.jobType}
-                    </span>
-                  </div>
+                    <h3 style={styles.jobTitle}>
+                      {job.title}
+                    </h3>
 
-                  {/* Job Title */}
-                  <h3>
-                    {job.title}
-                  </h3>
+                    <p style={styles.companyName}>
+                      {job.company}
+                    </p>
 
-                  {/* Company */}
-                  <p className="job-company">
-                    {job.company}
-                  </p>
+                    <div
+                      style={styles.metaContainer}
+                    >
+                      <div style={styles.metaItem}>
+                        <span
+                          style={styles.metaIcon}
+                        >
+                          📍
+                        </span>
 
-                  {/* Job Meta */}
-                  <div className="job-meta">
-                    <span>
-                      📍 {job.location}
-                    </span>
+                        <span>
+                          {job.location}
+                        </span>
+                      </div>
 
-                    <span>
-                      💰 {job.salary}
-                    </span>
-                  </div>
+                      <div style={styles.metaItem}>
+                        <span
+                          style={styles.metaIcon}
+                        >
+                          💰
+                        </span>
 
-                  {/* Description */}
-                  <p className="job-description">
-                    {job.description}
-                  </p>
+                        <span>
+                          {job.salary}
+                        </span>
+                      </div>
+                    </div>
 
-                  {/* Requirements */}
-                  {job.requirements &&
-                    job.requirements.length > 0 && (
-                      <div className="job-skills">
+                    <p style={styles.jobDescription}>
+                      {job.description}
+                    </p>
+
+                    {job.requirements?.length >
+                      0 && (
+                      <div style={styles.skills}>
                         {job.requirements
                           .slice(0, 3)
                           .map(
@@ -380,37 +579,61 @@ function Jobs() {
                             ) => (
                               <span
                                 key={index}
+                                style={styles.skill}
                               >
                                 {requirement}
                               </span>
                             )
                           )}
+
+                        {job.requirements.length >
+                          3 && (
+                          <span
+                            style={
+                              styles.moreSkills
+                            }
+                          >
+                            +
+                            {job.requirements
+                              .length - 3}
+                          </span>
+                        )}
                       </div>
                     )}
 
-                  {/* Card Footer */}
-                  <div className="job-card-footer">
-                    <span className="job-posted">
-                      Posted recently
-                    </span>
+                    <div style={styles.cardFooter}>
+                      <div
+                        style={styles.postedInfo}
+                      >
+                        <span
+                          style={styles.postedDot}
+                        ></span>
+                        Recently posted
+                      </div>
 
-                    <Link
-                      to={`/jobs/${job._id}`}
-                      className="view-job-button"
-                    >
-                      View Details →
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                      <Link
+                        to={`/jobs/${job._id}`}
+                        style={styles.viewButton}
+                      >
+                        View Details
+                        <span
+                          style={styles.arrow}
+                        >
+                          →
+                        </span>
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
 
-            {/* Pagination */}
+            {/* ==================== PAGINATION ==================== */}
+
             {pagination.totalPages > 1 && (
-              <div className="jobs-pagination">
+              <div style={styles.pagination}>
                 <button
                   type="button"
-                  className="pagination-button"
                   disabled={
                     !pagination.hasPreviousPage
                   }
@@ -419,18 +642,32 @@ function Jobs() {
                       currentPage - 1
                     )
                   }
+                  style={{
+                    ...styles.paginationButton,
+                    ...(!pagination.hasPreviousPage
+                      ? styles.paginationDisabled
+                      : {}),
+                  }}
                 >
                   ← Previous
                 </button>
 
-                <div className="pagination-info">
-                  Page {currentPage} of{" "}
-                  {pagination.totalPages}
+                <div style={styles.pageIndicator}>
+                  <span>Page</span>
+
+                  <strong>
+                    {currentPage}
+                  </strong>
+
+                  <span>of</span>
+
+                  <strong>
+                    {pagination.totalPages}
+                  </strong>
                 </div>
 
                 <button
                   type="button"
-                  className="pagination-button"
                   disabled={
                     !pagination.hasNextPage
                   }
@@ -439,6 +676,12 @@ function Jobs() {
                       currentPage + 1
                     )
                   }
+                  style={{
+                    ...styles.paginationButton,
+                    ...(!pagination.hasNextPage
+                      ? styles.paginationDisabled
+                      : {}),
+                  }}
                 >
                   Next →
                 </button>
@@ -450,5 +693,557 @@ function Jobs() {
     </main>
   );
 }
+
+// ==================== STYLES ====================
+
+const styles = {
+  page: {
+    minHeight: "calc(100vh - 70px)",
+    background:
+      "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%)",
+    position: "relative",
+    overflow: "hidden",
+    paddingBottom: "80px",
+  },
+
+  backgroundShapeOne: {
+    position: "absolute",
+    width: "520px",
+    height: "520px",
+    borderRadius: "50%",
+    background: "rgba(79, 70, 229, 0.06)",
+    top: "-270px",
+    left: "-220px",
+    pointerEvents: "none",
+  },
+
+  backgroundShapeTwo: {
+    position: "absolute",
+    width: "430px",
+    height: "430px",
+    borderRadius: "50%",
+    background: "rgba(37, 99, 235, 0.05)",
+    top: "620px",
+    right: "-240px",
+    pointerEvents: "none",
+  },
+
+  hero: {
+    maxWidth: "1180px",
+    margin: "0 auto",
+    padding: "65px 24px 38px",
+    position: "relative",
+    zIndex: 1,
+  },
+
+  heroContent: {
+    maxWidth: "850px",
+  },
+
+  eyebrow: {
+    display: "inline-block",
+    marginBottom: "14px",
+    color: "#4f46e5",
+    fontSize: "11px",
+    fontWeight: "800",
+    letterSpacing: "1.7px",
+  },
+
+  heading: {
+    margin: 0,
+    color: "#0f172a",
+    fontSize: "48px",
+    lineHeight: "1.1",
+    letterSpacing: "-2px",
+    fontWeight: "800",
+  },
+
+  headingHighlight: {
+    color: "#4f46e5",
+  },
+
+  heroDescription: {
+    maxWidth: "650px",
+    margin: "18px 0 0",
+    color: "#64748b",
+    fontSize: "16px",
+    lineHeight: "1.7",
+  },
+
+  heroStats: {
+    marginTop: "28px",
+    display: "flex",
+    alignItems: "center",
+    gap: "22px",
+  },
+
+  heroStat: {
+    display: "flex",
+    alignItems: "center",
+    gap: "9px",
+  },
+
+  heroStatIcon: {
+    width: "34px",
+    height: "34px",
+    borderRadius: "9px",
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "14px",
+  },
+
+  heroStatDivider: {
+    width: "1px",
+    height: "32px",
+    background: "#dbe3ef",
+  },
+
+  searchSection: {
+    maxWidth: "1180px",
+    margin: "0 auto",
+    padding: "0 24px",
+    position: "relative",
+    zIndex: 2,
+  },
+
+  searchCard: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "20px",
+    padding: "25px",
+    boxShadow:
+      "0 18px 45px rgba(15, 23, 42, 0.08)",
+  },
+
+  searchHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "22px",
+  },
+
+  searchTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontSize: "19px",
+    fontWeight: "800",
+  },
+
+  searchSubtitle: {
+    margin: "5px 0 0",
+    color: "#94a3b8",
+    fontSize: "12px",
+  },
+
+  searchIcon: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "12px",
+    background: "#eef2ff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "17px",
+  },
+
+  searchGrid: {
+    display: "grid",
+    gridTemplateColumns:
+      "1.5fr 1.1fr 1fr 1fr",
+    gap: "14px",
+  },
+
+  searchField: {
+    minWidth: 0,
+  },
+
+  label: {
+    display: "block",
+    marginBottom: "7px",
+    color: "#334155",
+    fontSize: "12px",
+    fontWeight: "700",
+  },
+
+  inputWrapper: {
+    minHeight: "46px",
+    display: "flex",
+    alignItems: "center",
+    border: "1px solid #dbe3ef",
+    borderRadius: "10px",
+    background: "#ffffff",
+  },
+
+  inputIcon: {
+    width: "38px",
+    flexShrink: 0,
+    textAlign: "center",
+    fontSize: "13px",
+    opacity: 0.65,
+  },
+
+  input: {
+    width: "100%",
+    minWidth: 0,
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    padding: "12px 10px 12px 0",
+    color: "#1e293b",
+    fontSize: "13px",
+  },
+
+  select: {
+    width: "100%",
+    minHeight: "46px",
+    border: "1px solid #dbe3ef",
+    borderRadius: "10px",
+    background: "#ffffff",
+    padding: "0 11px",
+    outline: "none",
+    color: "#334155",
+    fontSize: "13px",
+    cursor: "pointer",
+  },
+
+  searchActions: {
+    marginTop: "18px",
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "9px",
+  },
+
+  searchButton: {
+    minHeight: "43px",
+    border: "none",
+    borderRadius: "10px",
+    padding: "0 18px",
+    background:
+      "linear-gradient(135deg, #4f46e5, #2563eb)",
+    color: "#ffffff",
+    fontSize: "12px",
+    fontWeight: "700",
+    cursor: "pointer",
+    boxShadow:
+      "0 7px 17px rgba(79, 70, 229, 0.18)",
+  },
+
+  clearButton: {
+    minHeight: "43px",
+    border: "1px solid #dbe3ef",
+    borderRadius: "10px",
+    padding: "0 16px",
+    background: "#ffffff",
+    color: "#475569",
+    fontSize: "12px",
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  resultsSection: {
+    maxWidth: "1180px",
+    margin: "0 auto",
+    padding: "62px 24px 0",
+    position: "relative",
+    zIndex: 1,
+  },
+
+  resultsHeader: {
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    marginBottom: "27px",
+  },
+
+  resultsEyebrow: {
+    color: "#4f46e5",
+    fontSize: "10px",
+    fontWeight: "800",
+    letterSpacing: "1.5px",
+    marginBottom: "7px",
+  },
+
+  resultsTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontSize: "29px",
+    letterSpacing: "-0.8px",
+    fontWeight: "800",
+  },
+
+  resultsCount: {
+    margin: "7px 0 0",
+    color: "#94a3b8",
+    fontSize: "12px",
+  },
+
+  resultBadge: {
+    padding: "8px 12px",
+    borderRadius: "9px",
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    color: "#475569",
+    fontSize: "11px",
+    fontWeight: "700",
+  },
+
+  jobGrid: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(3, minmax(0, 1fr))",
+    gap: "20px",
+  },
+
+  jobCard: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "23px",
+    boxShadow:
+      "0 10px 30px rgba(15, 23, 42, 0.05)",
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "375px",
+  },
+
+  cardHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "20px",
+  },
+
+  companyIcon: {
+    width: "47px",
+    height: "47px",
+    borderRadius: "13px",
+    background:
+      "linear-gradient(135deg, #eef2ff, #e0e7ff)",
+    color: "#4f46e5",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "19px",
+    fontWeight: "800",
+  },
+
+  jobTypeBadge: {
+    padding: "6px 10px",
+    borderRadius: "999px",
+    fontSize: "10px",
+    fontWeight: "700",
+  },
+
+  jobTitle: {
+    margin: "0 0 6px",
+    color: "#0f172a",
+    fontSize: "18px",
+    lineHeight: "1.35",
+    fontWeight: "800",
+  },
+
+  companyName: {
+    margin: "0 0 17px",
+    color: "#4f46e5",
+    fontSize: "13px",
+    fontWeight: "700",
+  },
+
+  metaContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    paddingBottom: "16px",
+    borderBottom: "1px solid #f1f5f9",
+  },
+
+  metaItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    color: "#64748b",
+    fontSize: "11px",
+  },
+
+  metaIcon: {
+    fontSize: "12px",
+  },
+
+  jobDescription: {
+    margin: "15px 0",
+    color: "#64748b",
+    fontSize: "12px",
+    lineHeight: "1.65",
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  },
+
+  skills: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+    marginBottom: "18px",
+  },
+
+  skill: {
+    padding: "5px 8px",
+    borderRadius: "6px",
+    background: "#f5f3ff",
+    color: "#5b21b6",
+    fontSize: "10px",
+    fontWeight: "600",
+  },
+
+  moreSkills: {
+    padding: "5px 8px",
+    borderRadius: "6px",
+    background: "#f1f5f9",
+    color: "#64748b",
+    fontSize: "10px",
+    fontWeight: "700",
+  },
+
+  cardFooter: {
+    marginTop: "auto",
+    paddingTop: "15px",
+    borderTop: "1px solid #f1f5f9",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  },
+
+  postedInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    color: "#94a3b8",
+    fontSize: "10px",
+  },
+
+  postedDot: {
+    width: "6px",
+    height: "6px",
+    borderRadius: "50%",
+    background: "#22c55e",
+  },
+
+  viewButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    color: "#4f46e5",
+    textDecoration: "none",
+    fontSize: "11px",
+    fontWeight: "800",
+    whiteSpace: "nowrap",
+  },
+
+  arrow: {
+    fontSize: "15px",
+  },
+
+  pagination: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "25px",
+    marginTop: "45px",
+  },
+
+  paginationButton: {
+    minHeight: "40px",
+    border: "1px solid #dbe3ef",
+    borderRadius: "10px",
+    padding: "0 15px",
+    background: "#ffffff",
+    color: "#334155",
+    fontSize: "11px",
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  paginationDisabled: {
+    opacity: 0.45,
+    cursor: "not-allowed",
+  },
+
+  pageIndicator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "7px",
+    color: "#64748b",
+    fontSize: "12px",
+  },
+
+  messageBox: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "65px 25px",
+    textAlign: "center",
+    boxShadow:
+      "0 10px 30px rgba(15, 23, 42, 0.04)",
+  },
+
+  messageIcon: {
+    fontSize: "35px",
+    marginBottom: "13px",
+  },
+
+  emptyIcon: {
+    width: "58px",
+    height: "58px",
+    borderRadius: "16px",
+    background: "#eef2ff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 15px",
+    fontSize: "25px",
+  },
+
+  messageTitle: {
+    margin: "0 0 8px",
+    color: "#1e293b",
+    fontSize: "18px",
+    fontWeight: "800",
+  },
+
+  messageText: {
+    maxWidth: "500px",
+    margin: "0 auto 20px",
+    color: "#64748b",
+    fontSize: "13px",
+    lineHeight: "1.6",
+  },
+
+  primaryMessageButton: {
+    minHeight: "42px",
+    border: "none",
+    borderRadius: "10px",
+    padding: "0 18px",
+    background:
+      "linear-gradient(135deg, #4f46e5, #2563eb)",
+    color: "#ffffff",
+    fontSize: "12px",
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  spinner: {
+    width: "30px",
+    height: "30px",
+    border: "3px solid #e0e7ff",
+    borderTopColor: "#4f46e5",
+    borderRadius: "50%",
+    margin: "0 auto 17px",
+  },
+};
 
 export default Jobs;
