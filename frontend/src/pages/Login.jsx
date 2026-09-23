@@ -226,12 +226,21 @@ function Login() {
               {/* ==================== PASSWORD ==================== */}
 
               <div style={styles.field}>
-                <label
-                  htmlFor="password"
-                  style={styles.label}
-                >
-                  Password
-                </label>
+                <div style={styles.passwordLabelRow}>
+                  <label
+                    htmlFor="password"
+                    style={styles.label}
+                  >
+                    Password
+                  </label>
+
+                  <Link
+                    to="/forgot-password"
+                    style={styles.forgotPasswordLink}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
 
                 <div style={styles.inputWrapper}>
                   <span style={styles.inputIcon}>
@@ -567,6 +576,23 @@ const styles = {
 
   field: {
     marginBottom: "20px",
+  },
+
+  passwordLabelRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    marginBottom: "8px",
+  },
+
+  forgotPasswordLink: {
+    color: "#4f46e5",
+    textDecoration: "none",
+    fontSize: "12px",
+    fontWeight: "700",
+    marginBottom: "8px",
+    whiteSpace: "nowrap",
   },
 
   label: {

@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Job Seeker
 import JobSeekerDashboard from "./pages/JobSeekerDashboard";
@@ -50,6 +52,16 @@ function App() {
             <Route path="/login" element={<Login />} />
 
             <Route path="/register" element={<Register />} />
+
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword />}
+            />
+
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPassword />}
+            />
 
             <Route path="/jobs" element={<Jobs />} />
 
@@ -198,7 +210,9 @@ function App() {
               path="*"
               element={
                 <div style={styles.notFound}>
-                  <h1 style={styles.notFoundTitle}>404</h1>
+                  <h1 style={styles.notFoundTitle}>
+                    404
+                  </h1>
 
                   <p style={styles.notFoundText}>
                     Page not found.

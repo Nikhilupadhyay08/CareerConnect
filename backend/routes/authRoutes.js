@@ -4,6 +4,8 @@ const { body } = require("express-validator");
 const {
   registerUser,
   loginUser,
+  forgotPassword,
+  resetPassword,
   getMyProfile,
   updateMyProfile,
 } = require("../controllers/authController");
@@ -66,6 +68,36 @@ router.post(
   ],
   validateRequest,
   loginUser
+);
+
+// Forgot password
+router.post(
+  "/forgot-password",
+  [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Please provide a valid email address")
+      .normalizeEmail(),
+  ],
+  validateRequest,
+  forgotPassword
+);
+
+// Reset password
+router.post(
+  "/reset-password/:token",
+  [
+    body("password")
+      .notEmpty()
+      .withMessage("New password is required")
+      .isLength({ min: 6, max: 100 })
+      .withMessage("Password must be between 6 and 100 characters"),
+  ],
+  validateRequest,
+  resetPassword
 );
 
 // Get profile

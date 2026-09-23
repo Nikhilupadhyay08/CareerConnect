@@ -36,9 +36,10 @@ const createJob = async (req, res) => {
       job,
     });
   } catch (error) {
+    console.error("Create job error:", error);
+
     res.status(500).json({
       message: "Failed to create job",
-      error: error.message,
     });
   }
 };
@@ -89,7 +90,11 @@ const getAllJobs = async (req, res) => {
     }
 
     // Pagination
-    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+    const currentPage = Math.max(
+      parseInt(page, 10) || 1,
+      1
+    );
+
     const jobsPerPage = Math.min(
       Math.max(parseInt(limit, 10) || 10, 1),
       50
@@ -145,9 +150,10 @@ const getAllJobs = async (req, res) => {
       jobs,
     });
   } catch (error) {
+    console.error("Fetch jobs error:", error);
+
     res.status(500).json({
       message: "Failed to fetch jobs",
-      error: error.message,
     });
   }
 };
@@ -168,9 +174,10 @@ const getJobById = async (req, res) => {
 
     res.json(job);
   } catch (error) {
+    console.error("Fetch job error:", error);
+
     res.status(500).json({
       message: "Failed to fetch job",
-      error: error.message,
     });
   }
 };
@@ -214,8 +221,12 @@ const updateJob = async (req, res) => {
     if (title !== undefined) job.title = title;
     if (company !== undefined) job.company = company;
     if (location !== undefined) job.location = location;
-    if (description !== undefined) job.description = description;
-    if (requirements !== undefined) job.requirements = requirements;
+    if (description !== undefined) {
+      job.description = description;
+    }
+    if (requirements !== undefined) {
+      job.requirements = requirements;
+    }
     if (salary !== undefined) job.salary = salary;
     if (jobType !== undefined) job.jobType = jobType;
 
@@ -226,9 +237,10 @@ const updateJob = async (req, res) => {
       job,
     });
   } catch (error) {
+    console.error("Update job error:", error);
+
     res.status(500).json({
       message: "Failed to update job",
-      error: error.message,
     });
   }
 };
@@ -264,9 +276,10 @@ const deleteJob = async (req, res) => {
       message: "Job deleted successfully",
     });
   } catch (error) {
+    console.error("Delete job error:", error);
+
     res.status(500).json({
       message: "Failed to delete job",
-      error: error.message,
     });
   }
 };
@@ -291,12 +304,11 @@ const getMyJobs = async (req, res) => {
       count: jobs.length,
       jobs,
     });
-    } catch (error) {
-    console.error("GET MY JOBS ERROR:", error);
+  } catch (error) {
+    console.error("Fetch my jobs error:", error);
 
     res.status(500).json({
       message: "Failed to fetch your jobs",
-      error: error.message,
     });
   }
 };

@@ -17,9 +17,10 @@ const getAllUsers = async (req, res) => {
       users,
     });
   } catch (error) {
+    console.error("Fetch users error:", error);
+
     res.status(500).json({
       message: "Failed to fetch users",
-      error: error.message,
     });
   }
 };
@@ -39,14 +40,18 @@ const getAllJobs = async (req, res) => {
       jobs,
     });
   } catch (error) {
+    console.error("Fetch jobs error:", error);
+
     res.status(500).json({
       message: "Failed to fetch jobs",
-      error: error.message,
     });
   }
 };
 
+// ==========================================
 // Get all applications
+// ==========================================
+
 const getAllApplications = async (req, res) => {
   try {
     const applications = await Application.find()
@@ -66,9 +71,10 @@ const getAllApplications = async (req, res) => {
       applications,
     });
   } catch (error) {
+    console.error("Fetch applications error:", error);
+
     res.status(500).json({
       message: "Failed to fetch applications",
-      error: error.message,
     });
   }
 };
@@ -126,9 +132,10 @@ const getStats = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Fetch statistics error:", error);
+
     res.status(500).json({
       message: "Failed to fetch statistics",
-      error: error.message,
     });
   }
 };

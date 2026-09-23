@@ -8,6 +8,7 @@ const sendEmail = require("../utils/mail");
 // ============================================================
 // Apply for a job
 // ============================================================
+
 const applyForJob = async (req, res) => {
   try {
     // Only job seekers can apply
@@ -57,9 +58,7 @@ const applyForJob = async (req, res) => {
     }
 
     // Upload resume to Cloudinary
-    const uploadResult = await uploadToCloudinary(
-      req.file.buffer
-    );
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
 
     // Create application
     const application = await Application.create({
@@ -146,9 +145,10 @@ CareerConnect Team`,
       application,
     });
   } catch (error) {
+    console.error("Apply for job error:", error);
+
     res.status(500).json({
       message: "Failed to apply for job",
-      error: error.message,
     });
   }
 };
@@ -156,6 +156,7 @@ CareerConnect Team`,
 // ============================================================
 // Get applications of the logged-in job seeker
 // ============================================================
+
 const getMyApplications = async (req, res) => {
   try {
     if (req.user.role !== "jobseeker") {
@@ -175,9 +176,10 @@ const getMyApplications = async (req, res) => {
       applications,
     });
   } catch (error) {
+    console.error("Fetch applications error:", error);
+
     res.status(500).json({
       message: "Failed to fetch applications",
-      error: error.message,
     });
   }
 };
@@ -185,6 +187,7 @@ const getMyApplications = async (req, res) => {
 // ============================================================
 // Get applicants for an employer's job
 // ============================================================
+
 const getJobApplicants = async (req, res) => {
   try {
     // Only employers can view applicants
@@ -205,8 +208,7 @@ const getJobApplicants = async (req, res) => {
     // Make sure this job belongs to the logged-in employer
     if (job.employer.toString() !== req.user.userId) {
       return res.status(403).json({
-        message:
-          "You are not authorized to view these applicants",
+        message: "You are not authorized to view these applicants",
       });
     }
 
@@ -222,9 +224,10 @@ const getJobApplicants = async (req, res) => {
       applications,
     });
   } catch (error) {
+    console.error("Fetch applicants error:", error);
+
     res.status(500).json({
       message: "Failed to fetch applicants",
-      error: error.message,
     });
   }
 };
@@ -232,13 +235,13 @@ const getJobApplicants = async (req, res) => {
 // ============================================================
 // Update application status
 // ============================================================
+
 const updateApplicationStatus = async (req, res) => {
   try {
     // Only employers can update status
     if (req.user.role !== "employer") {
       return res.status(403).json({
-        message:
-          "Only employers can update application status",
+        message: "Only employers can update application status",
       });
     }
 
@@ -281,8 +284,7 @@ const updateApplicationStatus = async (req, res) => {
       req.user.userId
     ) {
       return res.status(403).json({
-        message:
-          "You are not authorized to update this application",
+        message: "You are not authorized to update this application",
       });
     }
 
@@ -296,9 +298,10 @@ const updateApplicationStatus = async (req, res) => {
       application,
     });
   } catch (error) {
+    console.error("Update application status error:", error);
+
     res.status(500).json({
       message: "Failed to update application status",
-      error: error.message,
     });
   }
 };
@@ -307,7 +310,9 @@ const updateApplicationStatus = async (req, res) => {
 // View resume in browser
 // Employers can view resumes for their own jobs.
 // Admins can view all resumes.
+// Job seekers can view their own resume.
 // ============================================================
+
 const viewResume = async (req, res) => {
   try {
     // Employers, admins, and the applicant can view resumes
@@ -345,8 +350,7 @@ const viewResume = async (req, res) => {
         req.user.userId
       ) {
         return res.status(403).json({
-          message:
-            "You are not authorized to view this resume",
+          message: "You are not authorized to view this resume",
         });
       }
     }
@@ -367,8 +371,7 @@ const viewResume = async (req, res) => {
         req.user.userId
       ) {
         return res.status(403).json({
-          message:
-            "You are not authorized to view this resume",
+          message: "You are not authorized to view this resume",
         });
       }
     }
@@ -399,7 +402,6 @@ const viewResume = async (req, res) => {
 
     res.status(500).json({
       message: "Failed to view resume",
-      error: error.message,
     });
   }
 };
@@ -409,6 +411,7 @@ const viewResume = async (req, res) => {
 // Employers can download resumes for their own jobs.
 // Admins can download all resumes.
 // ============================================================
+
 const downloadResume = async (req, res) => {
   try {
     // Only employers and admins can download resumes
@@ -417,8 +420,7 @@ const downloadResume = async (req, res) => {
       req.user.role !== "admin"
     ) {
       return res.status(403).json({
-        message:
-          "Only employers and admins can download resumes",
+        message: "Only employers and admins can download resumes",
       });
     }
 
@@ -455,8 +457,7 @@ const downloadResume = async (req, res) => {
         req.user.userId
       ) {
         return res.status(403).json({
-          message:
-            "You are not authorized to download this resume",
+          message: "You are not authorized to download this resume",
         });
       }
     }
@@ -487,7 +488,6 @@ const downloadResume = async (req, res) => {
 
     res.status(500).json({
       message: "Failed to download resume",
-      error: error.message,
     });
   }
 };
@@ -495,6 +495,7 @@ const downloadResume = async (req, res) => {
 // ============================================================
 // Exports
 // ============================================================
+
 module.exports = {
   applyForJob,
   getMyApplications,

@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const sendEmail = require("../utils/mail");
 
 // Generate JWT token
 const generateToken = (user) => {
@@ -69,9 +71,10 @@ const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Registration error:", error);
+
     res.status(500).json({
       message: "Registration failed",
-      error: error.message,
     });
   }
 };
@@ -79,9 +82,6 @@ const registerUser = async (req, res) => {
 // Login user
 const loginUser = async (req, res) => {
   try {
-    console.log("LOGIN EMAIL:", req.body.email);
-    console.log("PASSWORD RECEIVED:", !!req.body.password);
-
     const { email, password } = req.body;
 
     // Validate required fields
@@ -126,9 +126,165 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
+
     res.status(500).json({
       message: "Login failed",
-      error: error.message,
+    });
+  }
+};
+
+// Forgot password
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required",
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Return the same response even when the email does not exist
+    // to avoid revealing registered accounts.
+    if (!user) {
+      return res.json({
+        message:
+          "If an account exists with this email, a password reset link has been sent.",
+      });
+    }
+
+    // Generate a secure random token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Store token and expiry
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+    await user.save();
+
+    const frontendUrl =
+      process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "CareerConnect - Password Reset",
+      text: `You requested a password reset for your CareerConnect account.
+
+Reset your password using this link:
+${resetUrl}
+
+This link will expire in 15 minutes.
+
+If you did not request this password reset, you can safely ignore this email.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #334155;">
+          <h2 style="color: #4f46e5;">CareerConnect Password Reset</h2>
+
+          <p>You requested a password reset for your CareerConnect account.</p>
+
+          <p>
+            Click the button below to create a new password:
+          </p>
+
+          <p>
+            <a
+              href="${resetUrl}"
+              style="
+                display: inline-block;
+                padding: 12px 20px;
+                background: #4f46e5;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+              "
+            >
+              Reset Password
+            </a>
+          </p>
+
+          <p>
+            This link will expire in <strong>15 minutes</strong>.
+          </p>
+
+          <p>
+            If you did not request this password reset, you can safely ignore
+            this email.
+          </p>
+        </div>
+      `,
+    });
+
+    res.json({
+      message:
+        "If an account exists with this email, a password reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+
+    res.status(500).json({
+      message: "Failed to process password reset request",
+    });
+  }
+};
+
+// Reset password
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Reset token is required",
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        message: "New password is required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid or expired password reset link",
+      });
+    }
+
+    // Hash the new password
+    user.password = await bcrypt.hash(password, 10);
+
+    // Clear reset token after successful password change
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await user.save();
+
+    res.json({
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+
+    res.status(500).json({
+      message: "Failed to reset password",
     });
   }
 };
@@ -148,9 +304,10 @@ const getMyProfile = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.error("Fetch profile error:", error);
+
     res.status(500).json({
       message: "Failed to fetch profile",
-      error: error.message,
     });
   }
 };
@@ -201,9 +358,10 @@ const updateMyProfile = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Update profile error:", error);
+
     res.status(500).json({
       message: "Failed to update profile",
-      error: error.message,
     });
   }
 };
@@ -211,6 +369,8 @@ const updateMyProfile = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  forgotPassword,
+  resetPassword,
   getMyProfile,
   updateMyProfile,
 };

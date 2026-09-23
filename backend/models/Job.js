@@ -58,4 +58,11 @@ jobSchema.index({ jobType: 1, createdAt: -1 });
 jobSchema.index({ location: 1, createdAt: -1 });
 jobSchema.index({ employer: 1, createdAt: -1 });
 
+// Text index for advanced job searching
+jobSchema.index({
+  title: "text",
+  company: "text",
+  description: "text",
+});
+
 module.exports = mongoose.model("Job", jobSchema);

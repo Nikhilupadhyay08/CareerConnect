@@ -66,6 +66,47 @@ export const loginUser = async (loginData) => {
   return handleResponse(response, "Login failed");
 };
 
+// Forgot password
+export const forgotPassword = async (email) => {
+  const response = await fetch(
+    `${API_URL}/auth/forgot-password`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to process password reset request"
+  );
+};
+
+// Reset password
+export const resetPassword = async (
+  token,
+  password
+) => {
+  const response = await fetch(
+    `${API_URL}/auth/reset-password/${token}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to reset password"
+  );
+};
+
 
 // ==================== PROFILE ====================
 
@@ -209,6 +250,7 @@ export const deleteJob = async (token, jobId) => {
   );
 };
 
+
 // ==================== SAVED JOBS ====================
 
 // Save a job
@@ -280,6 +322,7 @@ export const checkSavedJob = async (
     "Failed to check saved job"
   );
 };
+
 
 // ==================== APPLICATIONS ====================
 
