@@ -15,6 +15,7 @@ const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const savedJobRoutes = require("./routes/savedJobRoutes");
 
 const protect = require("./middleware/authMiddleware");
 
@@ -76,6 +77,9 @@ app.use("/api/applications", applicationRoutes);
 
 // Admin routes
 app.use("/api/admin", adminRoutes);
+
+// Saved job routes
+app.use("/api/saved-jobs", savedJobRoutes);
 
 // Port
 const PORT = process.env.PORT || 4000;
