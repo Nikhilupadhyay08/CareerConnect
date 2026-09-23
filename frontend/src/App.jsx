@@ -13,6 +13,7 @@ import JobDetails from "./pages/JobDetails";
 
 // Job Seeker
 import JobSeekerDashboard from "./pages/JobSeekerDashboard";
+import SavedJobs from "./pages/SavedJobs";
 
 // Employer
 import EmployerDashboard from "./pages/EmployerDashboard";
@@ -64,6 +65,15 @@ function App() {
               element={
                 <ProtectedRoute allowedRole="jobseeker">
                   <JobSeekerDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/saved-jobs"
+              element={
+                <ProtectedRoute allowedRole="jobseeker">
+                  <SavedJobs />
                 </ProtectedRoute>
               }
             />

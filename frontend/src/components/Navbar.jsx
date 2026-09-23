@@ -94,11 +94,19 @@ function Navbar() {
             ) : (
               <>
                 {user?.role === "jobseeker" && (
-                  <NavLink
-                    to="/jobseeker/dashboard"
-                    label="Dashboard"
-                    active={isActive("/jobseeker/dashboard")}
-                  />
+                  <>
+                    <NavLink
+                      to="/jobseeker/dashboard"
+                      label="Dashboard"
+                      active={isActive("/jobseeker/dashboard")}
+                    />
+
+                    <NavLink
+                      to="/saved-jobs"
+                      label="Saved Jobs"
+                      active={isActive("/saved-jobs")}
+                    />
+                  </>
                 )}
 
                 {user?.role === "employer" && (
@@ -242,12 +250,20 @@ function Navbar() {
           ) : (
             <>
               {user?.role === "jobseeker" && (
+              <>
                 <MobileNavLink
                   to="/jobseeker/dashboard"
                   label="Dashboard"
                   active={isActive("/jobseeker/dashboard")}
                 />
-              )}
+
+                <MobileNavLink
+                  to="/saved-jobs"
+                  label="Saved Jobs"
+                  active={isActive("/saved-jobs")}
+                />
+              </>
+            )}
 
               {user?.role === "employer" && (
                 <MobileNavLink
