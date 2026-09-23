@@ -16,6 +16,22 @@ function JobDetails() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchJob = async () => {
       try {
@@ -94,7 +110,12 @@ function JobDetails() {
   if (loading) {
     return (
       <main style={styles.page}>
-        <div style={styles.messageContainer}>
+        <div
+          style={{
+            ...styles.messageContainer,
+            ...(isMobile ? styles.messageContainerMobile : {}),
+          }}
+        >
           <div style={styles.spinner}></div>
 
           <h2 style={styles.messageTitle}>
@@ -112,7 +133,12 @@ function JobDetails() {
   if (error && !job) {
     return (
       <main style={styles.page}>
-        <div style={styles.messageContainer}>
+        <div
+          style={{
+            ...styles.messageContainer,
+            ...(isMobile ? styles.messageContainerMobile : {}),
+          }}
+        >
           <div style={styles.messageIcon}>⚠️</div>
 
           <h2 style={styles.messageTitle}>
@@ -132,7 +158,12 @@ function JobDetails() {
   if (!job) {
     return (
       <main style={styles.page}>
-        <div style={styles.messageContainer}>
+        <div
+          style={{
+            ...styles.messageContainer,
+            ...(isMobile ? styles.messageContainerMobile : {}),
+          }}
+        >
           <div style={styles.messageIcon}>🔎</div>
 
           <h2 style={styles.messageTitle}>
@@ -157,16 +188,36 @@ function JobDetails() {
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          ...(isMobile ? styles.containerMobile : {}),
+        }}
+      >
         {/* BACK */}
         <Link to="/jobs" style={styles.backLink}>
           ← Back to Jobs
         </Link>
 
-        {/* ================= JOB HEADER ================= */}
-        <section style={styles.jobHeader}>
-          <div style={styles.headerMain}>
-            <div style={styles.companyIcon}>
+        {/* JOB HEADER */}
+        <section
+          style={{
+            ...styles.jobHeader,
+            ...(isMobile ? styles.jobHeaderMobile : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.headerMain,
+              ...(isMobile ? styles.headerMainMobile : {}),
+            }}
+          >
+            <div
+              style={{
+                ...styles.companyIcon,
+                ...(isMobile ? styles.companyIconMobile : {}),
+              }}
+            >
               {job.company
                 ? job.company.charAt(0).toUpperCase()
                 : "C"}
@@ -179,7 +230,14 @@ function JobDetails() {
                 </span>
               </div>
 
-              <h1 style={styles.jobTitle}>{job.title}</h1>
+              <h1
+                style={{
+                  ...styles.jobTitle,
+                  ...(isMobile ? styles.jobTitleMobile : {}),
+                }}
+              >
+                {job.title}
+              </h1>
 
               <p style={styles.companyName}>
                 {job.company}
@@ -200,11 +258,21 @@ function JobDetails() {
           </div>
         </section>
 
-        {/* ================= CONTENT ================= */}
-        <section style={styles.content}>
+        {/* CONTENT */}
+        <section
+          style={{
+            ...styles.content,
+            ...(isMobile ? styles.contentMobile : {}),
+          }}
+        >
           <div style={styles.mainColumn}>
             {/* DESCRIPTION */}
-            <div style={styles.detailsCard}>
+            <div
+              style={{
+                ...styles.detailsCard,
+                ...(isMobile ? styles.detailsCardMobile : {}),
+              }}
+            >
               <div style={styles.cardHeading}>
                 <div style={styles.cardIcon}>📋</div>
 
@@ -225,7 +293,12 @@ function JobDetails() {
             </div>
 
             {/* REQUIREMENTS */}
-            <div style={styles.detailsCard}>
+            <div
+              style={{
+                ...styles.detailsCard,
+                ...(isMobile ? styles.detailsCardMobile : {}),
+              }}
+            >
               <div style={styles.cardHeading}>
                 <div style={styles.cardIcon}>✓</div>
 
@@ -242,7 +315,14 @@ function JobDetails() {
 
               {job.requirements &&
               job.requirements.length > 0 ? (
-                <div style={styles.requirementsGrid}>
+                <div
+                  style={{
+                    ...styles.requirementsGrid,
+                    ...(isMobile
+                      ? styles.requirementsGridMobile
+                      : {}),
+                  }}
+                >
                   {job.requirements.map(
                     (requirement, index) => (
                       <div
@@ -267,7 +347,14 @@ function JobDetails() {
 
             {/* EMPLOYER */}
             {job.employer && (
-              <div style={styles.detailsCard}>
+              <div
+                style={{
+                  ...styles.detailsCard,
+                  ...(isMobile
+                    ? styles.detailsCardMobile
+                    : {}),
+                }}
+              >
                 <div style={styles.cardHeading}>
                   <div style={styles.cardIcon}>🏢</div>
 
@@ -309,10 +396,20 @@ function JobDetails() {
             )}
           </div>
 
-          {/* ================= SIDEBAR ================= */}
-          <aside style={styles.sidebar}>
+          {/* SIDEBAR */}
+          <aside
+            style={{
+              ...styles.sidebar,
+              ...(isMobile ? styles.sidebarMobile : {}),
+            }}
+          >
             {/* SUMMARY */}
-            <div style={styles.detailsCard}>
+            <div
+              style={{
+                ...styles.detailsCard,
+                ...(isMobile ? styles.detailsCardMobile : {}),
+              }}
+            >
               <div style={styles.cardHeading}>
                 <div style={styles.cardIcon}>ℹ️</div>
 
@@ -620,6 +717,10 @@ const styles = {
     zIndex: 1,
   },
 
+  containerMobile: {
+    padding: "28px 16px 0",
+  },
+
   backLink: {
     display: "inline-flex",
     alignItems: "center",
@@ -628,7 +729,6 @@ const styles = {
     fontSize: "13px",
     fontWeight: "700",
     marginBottom: "20px",
-    transition: "color 0.2s ease",
   },
 
   jobHeader: {
@@ -641,10 +741,21 @@ const styles = {
     marginBottom: "25px",
   },
 
+  jobHeaderMobile: {
+    padding: "22px",
+    borderRadius: "20px",
+    marginBottom: "18px",
+  },
+
   headerMain: {
     display: "flex",
     alignItems: "center",
     gap: "22px",
+  },
+
+  headerMainMobile: {
+    alignItems: "flex-start",
+    gap: "15px",
   },
 
   companyIcon: {
@@ -663,8 +774,16 @@ const styles = {
     boxShadow: "0 8px 20px rgba(79, 70, 229, 0.10)",
   },
 
+  companyIconMobile: {
+    width: "58px",
+    height: "58px",
+    borderRadius: "16px",
+    fontSize: "23px",
+  },
+
   headerInfo: {
     minWidth: 0,
+    flex: 1,
   },
 
   headerTop: {
@@ -692,6 +811,12 @@ const styles = {
     fontWeight: "800",
   },
 
+  jobTitleMobile: {
+    fontSize: "27px",
+    lineHeight: "1.15",
+    letterSpacing: "-0.6px",
+  },
+
   companyName: {
     margin: "0 0 13px",
     color: "#4f46e5",
@@ -702,7 +827,7 @@ const styles = {
   headerMeta: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "20px",
+    gap: "14px 20px",
     color: "#64748b",
     fontSize: "12px",
   },
@@ -718,10 +843,16 @@ const styles = {
     alignItems: "start",
   },
 
+  contentMobile: {
+    gridTemplateColumns: "1fr",
+    gap: "18px",
+  },
+
   mainColumn: {
     display: "flex",
     flexDirection: "column",
     gap: "20px",
+    minWidth: 0,
   },
 
   sidebar: {
@@ -730,6 +861,12 @@ const styles = {
     gap: "20px",
     position: "sticky",
     top: "90px",
+    minWidth: 0,
+  },
+
+  sidebarMobile: {
+    position: "static",
+    width: "100%",
   },
 
   detailsCard: {
@@ -738,6 +875,12 @@ const styles = {
     borderRadius: "18px",
     padding: "26px",
     boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
+  },
+
+  detailsCardMobile: {
+    padding: "20px",
+    borderRadius: "16px",
   },
 
   cardHeading: {
@@ -782,6 +925,7 @@ const styles = {
     fontSize: "14px",
     lineHeight: "1.85",
     whiteSpace: "pre-line",
+    overflowWrap: "anywhere",
   },
 
   requirementsGrid: {
@@ -789,6 +933,10 @@ const styles = {
     gridTemplateColumns:
       "repeat(auto-fit, minmax(220px, 1fr))",
     gap: "12px",
+  },
+
+  requirementsGridMobile: {
+    gridTemplateColumns: "1fr",
   },
 
   requirement: {
@@ -802,6 +950,8 @@ const styles = {
     color: "#475569",
     fontSize: "13px",
     lineHeight: "1.5",
+    minWidth: 0,
+    overflowWrap: "anywhere",
   },
 
   requirementCheck: {
@@ -828,6 +978,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "15px",
+    minWidth: 0,
   },
 
   employerAvatar: {
@@ -854,12 +1005,14 @@ const styles = {
     color: "#1e293b",
     fontSize: "15px",
     fontWeight: "800",
+    overflowWrap: "anywhere",
   },
 
   employerEmail: {
-    margin: "0",
+    margin: 0,
     color: "#64748b",
     fontSize: "12px",
+    overflowWrap: "anywhere",
   },
 
   verifiedBadge: {
@@ -891,10 +1044,12 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "9px",
+    minWidth: 0,
   },
 
   summaryIcon: {
     fontSize: "14px",
+    flexShrink: 0,
   },
 
   summaryLabel: {
@@ -907,6 +1062,7 @@ const styles = {
     color: "#334155",
     fontSize: "12px",
     textAlign: "right",
+    overflowWrap: "anywhere",
   },
 
   applyCard: {
@@ -916,12 +1072,14 @@ const styles = {
     borderRadius: "18px",
     padding: "26px",
     boxShadow: "0 12px 35px rgba(79, 70, 229, 0.09)",
+    minWidth: 0,
   },
 
   applyHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: "10px",
     marginBottom: "15px",
   },
 
@@ -934,6 +1092,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     fontSize: "19px",
+    flexShrink: 0,
   },
 
   applyBadge: {
@@ -975,7 +1134,6 @@ const styles = {
     padding: "14px",
     position: "relative",
     overflow: "hidden",
-    transition: "all 0.2s ease",
   },
 
   resumeUploadSelected: {
@@ -1018,6 +1176,7 @@ const styles = {
     flexDirection: "column",
     minWidth: 0,
     gap: "2px",
+    flex: 1,
   },
 
   fileName: {
@@ -1139,6 +1298,7 @@ const styles = {
     borderRadius: "18px",
     padding: "26px",
     boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
   },
 
   messageContainer: {
@@ -1150,6 +1310,11 @@ const styles = {
     border: "1px solid #e2e8f0",
     borderRadius: "20px",
     boxShadow: "0 15px 45px rgba(15, 23, 42, 0.07)",
+  },
+
+  messageContainerMobile: {
+    margin: "60px 16px",
+    padding: "35px 20px",
   },
 
   messageIcon: {
@@ -1180,21 +1345,21 @@ const styles = {
   },
 
   removeResumeButton: {
-  width: "28px",
-  height: "28px",
-  flexShrink: 0,
-  border: "none",
-  borderRadius: "8px",
-  background: "#fee2e2",
-  color: "#dc2626",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "12px",
-  fontWeight: "800",
-  cursor: "pointer",
-  marginLeft: "auto",
-},
+    width: "28px",
+    height: "28px",
+    flexShrink: 0,
+    border: "none",
+    borderRadius: "8px",
+    background: "#fee2e2",
+    color: "#dc2626",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: "800",
+    cursor: "pointer",
+    marginLeft: "auto",
+  },
 };
 
 export default JobDetails;

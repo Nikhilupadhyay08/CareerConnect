@@ -1,8 +1,25 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Home() {
   const { user, isAuthenticated } = useAuth();
+
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const dashboardPath =
     user?.role === "admin"
@@ -17,15 +34,25 @@ function Home() {
       <div style={styles.backgroundShapeTwo}></div>
 
       {/* ================= HERO ================= */}
-      <section style={styles.heroSection}>
-        <div style={styles.heroContent}>
 
+      <section
+        style={{
+          ...styles.heroSection,
+          ...(isMobile ? styles.heroSectionMobile : {}),
+        }}
+      >
+        <div style={styles.heroContent}>
           <div style={styles.badge}>
             <span style={styles.badgeDot}></span>
             Your next opportunity starts here
           </div>
 
-          <h1 style={styles.heroHeading}>
+          <h1
+            style={{
+              ...styles.heroHeading,
+              ...(isMobile ? styles.heroHeadingMobile : {}),
+            }}
+          >
             Find work that
             <br />
             <span style={styles.highlight}>
@@ -33,13 +60,25 @@ function Home() {
             </span>
           </h1>
 
-          <p style={styles.heroDescription}>
-            Discover meaningful opportunities, connect with employers,
-            apply with confidence, and manage your career journey from
-            one place.
+          <p
+            style={{
+              ...styles.heroDescription,
+              ...(isMobile
+                ? styles.heroDescriptionMobile
+                : {}),
+            }}
+          >
+            Discover meaningful opportunities, connect with
+            employers, apply with confidence, and manage your
+            career journey from one place.
           </p>
 
-          <div style={styles.heroButtons}>
+          <div
+            style={{
+              ...styles.heroButtons,
+              ...(isMobile ? styles.heroButtonsMobile : {}),
+            }}
+          >
             <Link
               to="/jobs"
               style={styles.primaryButton}
@@ -68,14 +107,27 @@ function Home() {
           </div>
 
           {/* Process */}
-          <div style={styles.process}>
+
+          <div
+            style={{
+              ...styles.process,
+              ...(isMobile ? styles.processMobile : {}),
+            }}
+          >
             <ProcessItem
               number="01"
               title="Discover"
               text="Find opportunities"
             />
 
-            <div style={styles.processLine}></div>
+            <div
+              style={{
+                ...styles.processLine,
+                ...(isMobile
+                  ? styles.processLineMobile
+                  : {}),
+              }}
+            ></div>
 
             <ProcessItem
               number="02"
@@ -83,7 +135,14 @@ function Home() {
               text="Apply with ease"
             />
 
-            <div style={styles.processLine}></div>
+            <div
+              style={{
+                ...styles.processLine,
+                ...(isMobile
+                  ? styles.processLineMobile
+                  : {}),
+              }}
+            ></div>
 
             <ProcessItem
               number="03"
@@ -91,22 +150,23 @@ function Home() {
               text="Build your career"
             />
           </div>
-
         </div>
 
         {/* ================= HERO VISUAL ================= */}
-        <div style={styles.heroVisual}>
 
+        <div
+          style={{
+            ...styles.heroVisual,
+            ...(isMobile ? styles.heroVisualMobile : {}),
+          }}
+        >
           <div style={styles.heroGlow}></div>
 
           <div style={styles.heroCard}>
-
             <div style={styles.heroCardHeader}>
-              <div style={styles.heroCardIcon}>
-                💼
-              </div>
+              <div style={styles.heroCardIcon}>💼</div>
 
-              <div>
+              <div style={styles.heroCardHeaderText}>
                 <span style={styles.cardSmallLabel}>
                   CAREERCONNECT
                 </span>
@@ -116,9 +176,7 @@ function Home() {
                 </strong>
               </div>
 
-              <span style={styles.liveBadge}>
-                ● LIVE
-              </span>
+              <span style={styles.liveBadge}>● LIVE</span>
             </div>
 
             <div style={styles.cardDivider}></div>
@@ -135,58 +193,54 @@ function Home() {
               </h2>
 
               <p style={styles.heroCardDescription}>
-                Search for jobs, submit your resume, and keep track
-                of your applications from one simple dashboard.
+                Search for jobs, submit your resume, and keep
+                track of your applications from one simple
+                dashboard.
               </p>
             </div>
 
             <div style={styles.miniSearch}>
-              <span style={styles.miniSearchIcon}>
-                🔎
-              </span>
+              <span style={styles.miniSearchIcon}>🔎</span>
 
               <span style={styles.miniSearchText}>
                 Search opportunities
               </span>
 
-              <span style={styles.miniSearchArrow}>
-                →
-              </span>
+              <span style={styles.miniSearchArrow}>→</span>
             </div>
 
             <div style={styles.heroCardStats}>
-
-              <StatItem
-                number="01"
-                title="Find jobs"
-              />
-
-              <StatItem
-                number="02"
-                title="Apply easily"
-              />
-
-              <StatItem
-                number="03"
-                title="Track progress"
-              />
-
+              <StatItem number="01" title="Find jobs" />
+              <StatItem number="02" title="Apply easily" />
+              <StatItem number="03" title="Track progress" />
             </div>
-
           </div>
-
         </div>
       </section>
 
       {/* ================= FEATURES ================= */}
-      <section style={styles.featuresSection}>
 
+      <section
+        style={{
+          ...styles.featuresSection,
+          ...(isMobile
+            ? styles.featuresSectionMobile
+            : {}),
+        }}
+      >
         <div style={styles.sectionHeading}>
           <span style={styles.sectionLabel}>
             WHY CAREERCONNECT?
           </span>
 
-          <h2 style={styles.sectionTitle}>
+          <h2
+            style={{
+              ...styles.sectionTitle,
+              ...(isMobile
+                ? styles.sectionTitleMobile
+                : {}),
+            }}
+          >
             Everything you need for your
             <br />
             <span style={styles.highlight}>
@@ -195,13 +249,19 @@ function Home() {
           </h2>
 
           <p style={styles.sectionDescription}>
-            A simple platform designed to connect talented people
-            with meaningful opportunities.
+            A simple platform designed to connect talented
+            people with meaningful opportunities.
           </p>
         </div>
 
-        <div style={styles.featureGrid}>
-
+        <div
+          style={{
+            ...styles.featureGrid,
+            ...(isMobile
+              ? styles.featureGridMobile
+              : {}),
+          }}
+        >
           <FeatureCard
             number="01"
             icon="🔎"
@@ -222,20 +282,32 @@ function Home() {
             title="Track Applications"
             description="Keep track of your applications and monitor their current status."
           />
-
         </div>
       </section>
 
       {/* ================= EMPLOYER ================= */}
-      <section style={styles.employerSection}>
 
+      <section
+        style={{
+          ...styles.employerSection,
+          ...(isMobile
+            ? styles.employerSectionMobile
+            : {}),
+        }}
+      >
         <div style={styles.employerContent}>
-
           <span style={styles.employerLabel}>
             FOR EMPLOYERS
           </span>
 
-          <h2 style={styles.employerTitle}>
+          <h2
+            style={{
+              ...styles.employerTitle,
+              ...(isMobile
+                ? styles.employerTitleMobile
+                : {}),
+            }}
+          >
             Find the right talent
             <br />
             <span style={styles.employerHighlight}>
@@ -244,8 +316,9 @@ function Home() {
           </h2>
 
           <p style={styles.employerDescription}>
-            Create job openings, manage applicants, review resumes,
-            and update application statuses from one dashboard.
+            Create job openings, manage applicants, review
+            resumes, and update application statuses from one
+            dashboard.
           </p>
 
           <Link
@@ -262,128 +335,108 @@ function Home() {
 
             <span>→</span>
           </Link>
-
         </div>
 
         <div style={styles.employerVisual}>
-
           <div style={styles.employerGlow}></div>
 
           <div style={styles.employerCard}>
-
             <div style={styles.employerCardHeader}>
-
-              <div style={styles.companyIcon}>
-                🏢
-              </div>
+              <div style={styles.companyIcon}>🏢</div>
 
               <div style={styles.employerCardHeading}>
-                <strong>
-                  Build your team
-                </strong>
+                <strong>Build your team</strong>
 
-                <span>
-                  Find skilled candidates
-                </span>
+                <span>Find skilled candidates</span>
               </div>
-
             </div>
 
             <div style={styles.candidateRow}>
-
-              <div style={styles.avatar}>
-                👤
-              </div>
+              <div style={styles.avatar}>👤</div>
 
               <div style={styles.candidateInfo}>
-                <strong>
-                  Skilled candidates
-                </strong>
+                <strong>Skilled candidates</strong>
 
                 <span>
                   Ready for their next opportunity
                 </span>
               </div>
 
-              <span style={styles.checkMark}>
-                ✓
-              </span>
-
+              <span style={styles.checkMark}>✓</span>
             </div>
 
             <div style={styles.candidateRow}>
-
-              <div style={styles.avatar}>
-                💻
-              </div>
+              <div style={styles.avatar}>💻</div>
 
               <div style={styles.candidateInfo}>
-                <strong>
-                  Relevant skills
-                </strong>
+                <strong>Relevant skills</strong>
 
                 <span>
                   Connect with the right talent
                 </span>
               </div>
 
-              <span style={styles.checkMark}>
-                ✓
-              </span>
-
+              <span style={styles.checkMark}>✓</span>
             </div>
 
             <div style={styles.candidateRow}>
-
-              <div style={styles.avatar}>
-                📈
-              </div>
+              <div style={styles.avatar}>📈</div>
 
               <div style={styles.candidateInfo}>
-                <strong>
-                  Manage applications
-                </strong>
+                <strong>Manage applications</strong>
 
                 <span>
                   Track candidates in one place
                 </span>
               </div>
 
-              <span style={styles.checkMark}>
-                ✓
-              </span>
-
+              <span style={styles.checkMark}>✓</span>
             </div>
-
           </div>
-
         </div>
-
       </section>
 
       {/* ================= CTA ================= */}
+
       {!isAuthenticated && (
-        <section style={styles.ctaSection}>
-
-          <div style={styles.ctaContent}>
-
-            <div style={styles.ctaIcon}>
-              🚀
-            </div>
+        <section
+          style={{
+            ...styles.ctaSection,
+            ...(isMobile
+              ? styles.ctaSectionMobile
+              : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.ctaContent,
+              ...(isMobile
+                ? styles.ctaContentMobile
+                : {}),
+            }}
+          >
+            <div style={styles.ctaIcon}>🚀</div>
 
             <span style={styles.ctaBadge}>
               GET STARTED
             </span>
 
-            <h2 style={styles.ctaTitle}>
+            <h2
+              style={{
+                ...styles.ctaTitle,
+                ...(isMobile
+                  ? styles.ctaTitleMobile
+                  : {}),
+              }}
+            >
               Ready to take the
               <br />
               <span>next step?</span>
             </h2>
 
             <p style={styles.ctaDescription}>
-              Create your CareerConnect account and start exploring
-              opportunities today.
+              Create your CareerConnect account and start
+              exploring opportunities today.
             </p>
 
             <Link
@@ -393,9 +446,7 @@ function Home() {
               Create Your Account
               <span>→</span>
             </Link>
-
           </div>
-
         </section>
       )}
     </main>
@@ -407,9 +458,11 @@ function Home() {
 function ProcessItem({ number, title, text }) {
   return (
     <div style={styles.processItem}>
-      <strong>{number}</strong>
+      <strong style={styles.processNumber}>
+        {number}
+      </strong>
 
-      <div>
+      <div style={styles.processText}>
         <span>{title}</span>
         <small>{text}</small>
       </div>
@@ -438,32 +491,26 @@ function FeatureCard({
 }) {
   return (
     <div style={styles.featureCard}>
-
       <div style={styles.featureTop}>
-
-        <div style={styles.featureIcon}>
-          {icon}
-        </div>
+        <div style={styles.featureIcon}>{icon}</div>
 
         <span style={styles.featureNumber}>
           {number}
         </span>
-
       </div>
 
-      <h3 style={styles.featureTitle}>
-        {title}
-      </h3>
+      <h3 style={styles.featureTitle}>{title}</h3>
 
       <p style={styles.featureDescription}>
         {description}
       </p>
 
       <div style={styles.featureLine}></div>
-
     </div>
   );
 }
+
+/* ================= STYLES ================= */
 
 const styles = {
   page: {
@@ -471,7 +518,8 @@ const styles = {
     background:
       "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%)",
     position: "relative",
-    overflow: "hidden",
+    overflowX: "hidden",
+    overflowY: "hidden",
   },
 
   backgroundShapeOne: {
@@ -496,6 +544,8 @@ const styles = {
     pointerEvents: "none",
   },
 
+  /* ================= HERO ================= */
+
   heroSection: {
     maxWidth: "1180px",
     margin: "0 auto",
@@ -507,10 +557,25 @@ const styles = {
     alignItems: "center",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
+  },
+
+  heroSectionMobile: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: "35px",
+    minHeight: "auto",
+    width: "100%",
+    padding: "48px 18px 55px",
+    boxSizing: "border-box",
   },
 
   heroContent: {
     maxWidth: "660px",
+    minWidth: 0,
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   badge: {
@@ -525,6 +590,9 @@ const styles = {
     fontWeight: "700",
     marginBottom: "24px",
     border: "1px solid #e0e7ff",
+    maxWidth: "100%",
+    boxSizing: "border-box",
+    whiteSpace: "normal",
   },
 
   badgeDot: {
@@ -532,6 +600,7 @@ const styles = {
     height: "7px",
     borderRadius: "50%",
     background: "#4f46e5",
+    flexShrink: 0,
   },
 
   heroHeading: {
@@ -541,6 +610,16 @@ const styles = {
     color: "#0f172a",
     margin: "0 0 23px",
     fontWeight: "800",
+    maxWidth: "100%",
+    overflowWrap: "break-word",
+  },
+
+  heroHeadingMobile: {
+    fontSize: "36px",
+    lineHeight: "1.1",
+    letterSpacing: "-1.4px",
+    marginBottom: "20px",
+    maxWidth: "100%",
   },
 
   highlight: {
@@ -553,6 +632,14 @@ const styles = {
     fontSize: "17px",
     lineHeight: "1.7",
     margin: "0 0 30px",
+    overflowWrap: "break-word",
+  },
+
+  heroDescriptionMobile: {
+    fontSize: "15px",
+    lineHeight: "1.65",
+    marginBottom: "25px",
+    maxWidth: "100%",
   },
 
   heroButtons: {
@@ -560,6 +647,12 @@ const styles = {
     alignItems: "center",
     gap: "11px",
     flexWrap: "wrap",
+    maxWidth: "100%",
+  },
+
+  heroButtonsMobile: {
+    gap: "10px",
+    width: "100%",
   },
 
   primaryButton: {
@@ -577,6 +670,9 @@ const styles = {
     fontWeight: "700",
     boxShadow:
       "0 9px 22px rgba(79, 70, 229, 0.20)",
+    boxSizing: "border-box",
+    cursor: "pointer",
+    whiteSpace: "nowrap",
   },
 
   buttonArrow: {
@@ -597,33 +693,75 @@ const styles = {
     border: "1px solid #dbe2ea",
     boxShadow:
       "0 5px 15px rgba(15, 23, 42, 0.05)",
+    boxSizing: "border-box",
+    cursor: "pointer",
+    whiteSpace: "nowrap",
   },
+
+  /* ================= PROCESS ================= */
 
   process: {
     display: "flex",
     alignItems: "center",
     gap: "17px",
     marginTop: "42px",
+    maxWidth: "100%",
+  },
+
+  processMobile: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    alignItems: "start",
+    gap: "7px",
+    marginTop: "32px",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box",
   },
 
   processItem: {
     display: "flex",
     alignItems: "center",
     gap: "9px",
+    minWidth: 0,
+    flex: 1,
+  },
+
+  processNumber: {
+    flexShrink: 0,
+    color: "#0f172a",
+    fontSize: "13px",
+  },
+
+  processText: {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
   },
 
   processLine: {
     width: "28px",
     height: "1px",
     background: "#cbd5e1",
+    flexShrink: 1,
   },
 
-  processItemStrong: {
-    color: "#4f46e5",
+  processLineMobile: {
+    display: "none",
   },
+
+  /* ================= HERO VISUAL ================= */
 
   heroVisual: {
     position: "relative",
+    minWidth: 0,
+    width: "100%",
+  },
+
+  heroVisualMobile: {
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box",
   },
 
   heroGlow: {
@@ -631,15 +769,18 @@ const styles = {
     width: "300px",
     height: "300px",
     borderRadius: "50%",
-    background:
-      "rgba(99, 102, 241, 0.10)",
+    background: "rgba(99, 102, 241, 0.10)",
     top: "-60px",
     right: "-55px",
     filter: "blur(2px)",
+    pointerEvents: "none",
   },
 
   heroCard: {
     position: "relative",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box",
     background: "#ffffff",
     borderRadius: "26px",
     padding: "30px",
@@ -653,6 +794,13 @@ const styles = {
     alignItems: "center",
     gap: "11px",
     marginBottom: "21px",
+    minWidth: 0,
+    maxWidth: "100%",
+  },
+
+  heroCardHeaderText: {
+    minWidth: 0,
+    flex: 1,
   },
 
   heroCardIcon: {
@@ -680,6 +828,7 @@ const styles = {
     display: "block",
     color: "#334155",
     fontSize: "12px",
+    overflowWrap: "break-word",
   },
 
   liveBadge: {
@@ -690,6 +839,7 @@ const styles = {
     borderRadius: "999px",
     fontSize: "9px",
     fontWeight: "800",
+    flexShrink: 0,
   },
 
   cardDivider: {
@@ -700,6 +850,7 @@ const styles = {
 
   heroCardMain: {
     marginBottom: "22px",
+    minWidth: 0,
   },
 
   cardMainLabel: {
@@ -715,6 +866,7 @@ const styles = {
     lineHeight: "1.2",
     color: "#111827",
     letterSpacing: "-0.8px",
+    overflowWrap: "break-word",
   },
 
   heroCardDescription: {
@@ -722,6 +874,7 @@ const styles = {
     color: "#64748b",
     fontSize: "13px",
     lineHeight: "1.65",
+    overflowWrap: "break-word",
   },
 
   miniSearch: {
@@ -733,27 +886,36 @@ const styles = {
     background: "#f8fafc",
     border: "1px solid #e2e8f0",
     marginBottom: "23px",
+    boxSizing: "border-box",
+    maxWidth: "100%",
   },
 
   miniSearchIcon: {
     fontSize: "13px",
+    flexShrink: 0,
   },
 
   miniSearchText: {
     flex: 1,
     color: "#94a3b8",
     fontSize: "11px",
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 
   miniSearchArrow: {
     color: "#4f46e5",
     fontWeight: "800",
+    flexShrink: 0,
   },
 
   heroCardStats: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
     gap: "10px",
+    maxWidth: "100%",
   },
 
   statItem: {
@@ -763,7 +925,11 @@ const styles = {
     padding: "10px",
     borderRadius: "9px",
     background: "#f8fafc",
+    minWidth: 0,
+    boxSizing: "border-box",
   },
+
+  /* ================= FEATURES ================= */
 
   featuresSection: {
     maxWidth: "1180px",
@@ -771,6 +937,11 @@ const styles = {
     padding: "80px 24px",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
+  },
+
+  featuresSectionMobile: {
+    padding: "55px 18px",
   },
 
   sectionHeading: {
@@ -796,6 +967,12 @@ const styles = {
     fontWeight: "800",
   },
 
+  sectionTitleMobile: {
+    fontSize: "30px",
+    lineHeight: "1.18",
+    letterSpacing: "-1px",
+  },
+
   sectionDescription: {
     margin: 0,
     color: "#64748b",
@@ -809,6 +986,11 @@ const styles = {
     gap: "20px",
   },
 
+  featureGridMobile: {
+    gridTemplateColumns: "1fr",
+    gap: "15px",
+  },
+
   featureCard: {
     background: "#ffffff",
     border: "1px solid #e2e8f0",
@@ -816,6 +998,7 @@ const styles = {
     padding: "27px",
     boxShadow:
       "0 10px 30px rgba(15, 23, 42, 0.05)",
+    boxSizing: "border-box",
   },
 
   featureTop: {
@@ -863,6 +1046,8 @@ const styles = {
     background: "#4f46e5",
   },
 
+  /* ================= EMPLOYER ================= */
+
   employerSection: {
     maxWidth: "1180px",
     margin: "30px auto 0",
@@ -876,11 +1061,23 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     zIndex: 1,
+    boxSizing: "border-box",
+  },
+
+  employerSectionMobile: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: "35px",
+    margin: "20px 18px 0",
+    padding: "42px 24px",
+    borderRadius: "22px",
   },
 
   employerContent: {
     position: "relative",
     zIndex: 2,
+    minWidth: 0,
   },
 
   employerLabel: {
@@ -898,6 +1095,12 @@ const styles = {
     fontSize: "39px",
     lineHeight: "1.15",
     letterSpacing: "-1.3px",
+  },
+
+  employerTitleMobile: {
+    fontSize: "30px",
+    lineHeight: "1.18",
+    letterSpacing: "-1px",
   },
 
   employerHighlight: {
@@ -923,11 +1126,14 @@ const styles = {
     borderRadius: "10px",
     fontSize: "12px",
     fontWeight: "800",
+    cursor: "pointer",
   },
 
   employerVisual: {
     position: "relative",
     zIndex: 2,
+    width: "100%",
+    minWidth: 0,
   },
 
   employerGlow: {
@@ -935,14 +1141,15 @@ const styles = {
     width: "230px",
     height: "230px",
     borderRadius: "50%",
-    background:
-      "rgba(99, 102, 241, 0.20)",
+    background: "rgba(99, 102, 241, 0.20)",
     right: "-50px",
     top: "-50px",
   },
 
   employerCard: {
     position: "relative",
+    width: "100%",
+    boxSizing: "border-box",
     background: "#ffffff",
     borderRadius: "18px",
     padding: "21px",
@@ -968,12 +1175,14 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     fontSize: "18px",
+    flexShrink: 0,
   },
 
   employerCardHeading: {
     display: "flex",
     flexDirection: "column",
     gap: "3px",
+    minWidth: 0,
   },
 
   candidateRow: {
@@ -982,6 +1191,7 @@ const styles = {
     gap: "10px",
     padding: "12px 0",
     borderBottom: "1px solid #f1f5f9",
+    minWidth: 0,
   },
 
   avatar: {
@@ -1001,6 +1211,7 @@ const styles = {
     flexDirection: "column",
     gap: "3px",
     flex: 1,
+    minWidth: 0,
   },
 
   checkMark: {
@@ -1014,7 +1225,10 @@ const styles = {
     justifyContent: "center",
     fontSize: "11px",
     fontWeight: "800",
+    flexShrink: 0,
   },
+
+  /* ================= CTA ================= */
 
   ctaSection: {
     maxWidth: "1180px",
@@ -1022,6 +1236,12 @@ const styles = {
     padding: "0 24px",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
+  },
+
+  ctaSectionMobile: {
+    margin: "55px 0",
+    padding: "0 18px",
   },
 
   ctaContent: {
@@ -1030,6 +1250,12 @@ const styles = {
     border: "1px solid #e0e7ff",
     borderRadius: "27px",
     padding: "65px 30px",
+    boxSizing: "border-box",
+  },
+
+  ctaContentMobile: {
+    padding: "45px 20px",
+    borderRadius: "22px",
   },
 
   ctaIcon: {
@@ -1061,6 +1287,12 @@ const styles = {
     letterSpacing: "-1.4px",
   },
 
+  ctaTitleMobile: {
+    fontSize: "30px",
+    lineHeight: "1.18",
+    letterSpacing: "-1px",
+  },
+
   ctaDescription: {
     maxWidth: "500px",
     margin: "0 auto 26px",
@@ -1083,6 +1315,8 @@ const styles = {
     fontWeight: "700",
     boxShadow:
       "0 8px 20px rgba(79, 70, 229, 0.20)",
+    boxSizing: "border-box",
+    cursor: "pointer",
   },
 };
 

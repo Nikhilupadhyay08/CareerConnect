@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { registerUser } from "../services/api";
@@ -18,6 +18,21 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // ==================== HANDLERS ====================
 
@@ -83,15 +98,30 @@ function Register() {
   };
 
   return (
-    <div style={styles.page}>
+    <div
+      style={{
+        ...styles.page,
+        ...(isMobile ? styles.pageMobile : {}),
+      }}
+    >
       {/* Background Decorations */}
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          ...(isMobile ? styles.containerMobile : {}),
+        }}
+      >
         {/* ==================== LEFT SIDE ==================== */}
 
-        <div style={styles.brandSection}>
+        <div
+          style={{
+            ...styles.brandSection,
+            ...(isMobile ? styles.brandSectionMobile : {}),
+          }}
+        >
           <div style={styles.brandContent}>
             <div style={styles.badge}>
               🚀 Start your journey
@@ -137,9 +167,19 @@ function Register() {
         {/* ==================== RIGHT SIDE ==================== */}
 
         <div style={styles.formSection}>
-          <div style={styles.formCard}>
+          <div
+            style={{
+              ...styles.formCard,
+              ...(isMobile ? styles.formCardMobile : {}),
+            }}
+          >
             <div style={styles.formHeader}>
-              <h2 style={styles.title}>
+              <h2
+                style={{
+                  ...styles.title,
+                  ...(isMobile ? styles.titleMobile : {}),
+                }}
+              >
                 Create your account
               </h2>
 
@@ -149,6 +189,7 @@ function Register() {
             </div>
 
             {/* Error Message */}
+
             {error && (
               <div style={styles.errorBox}>
                 <span>⚠</span>
@@ -273,7 +314,14 @@ function Register() {
                   I am a
                 </label>
 
-                <div style={styles.roleContainer}>
+                <div
+                  style={{
+                    ...styles.roleContainer,
+                    ...(isMobile
+                      ? styles.roleContainerMobile
+                      : {}),
+                  }}
+                >
                   <RoleCard
                     selected={
                       formData.role === "jobseeker"
@@ -446,6 +494,14 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     padding: "50px 24px",
+    boxSizing: "border-box",
+  },
+
+  pageMobile: {
+    minHeight: "calc(100vh - 70px)",
+    padding: "24px 14px 35px",
+    overflowX: "hidden",
+    overflowY: "auto",
   },
 
   backgroundShapeOne: {
@@ -456,6 +512,7 @@ const styles = {
     background: "rgba(99, 102, 241, 0.08)",
     top: "-180px",
     left: "-150px",
+    pointerEvents: "none",
   },
 
   backgroundShapeTwo: {
@@ -466,6 +523,7 @@ const styles = {
     background: "rgba(59, 130, 246, 0.07)",
     bottom: "-150px",
     right: "-100px",
+    pointerEvents: "none",
   },
 
   container: {
@@ -477,10 +535,21 @@ const styles = {
     alignItems: "center",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
+  },
+
+  containerMobile: {
+    display: "block",
+    width: "100%",
+    maxWidth: "100%",
   },
 
   brandSection: {
     padding: "20px 0",
+  },
+
+  brandSectionMobile: {
+    display: "none",
   },
 
   brandContent: {
@@ -534,6 +603,7 @@ const styles = {
   featureIcon: {
     width: "45px",
     height: "45px",
+    flexShrink: 0,
     borderRadius: "12px",
     background: "#ffffff",
     display: "flex",
@@ -559,6 +629,7 @@ const styles = {
 
   formSection: {
     width: "100%",
+    boxSizing: "border-box",
   },
 
   formCard: {
@@ -569,6 +640,15 @@ const styles = {
       "0 20px 60px rgba(15, 23, 42, 0.10)",
     border:
       "1px solid rgba(226, 232, 240, 0.8)",
+    boxSizing: "border-box",
+  },
+
+  formCardMobile: {
+    width: "100%",
+    padding: "24px 18px",
+    borderRadius: "18px",
+    boxShadow:
+      "0 12px 35px rgba(15, 23, 42, 0.09)",
   },
 
   formHeader: {
@@ -583,10 +663,16 @@ const styles = {
     letterSpacing: "-0.6px",
   },
 
+  titleMobile: {
+    fontSize: "25px",
+    lineHeight: "1.2",
+  },
+
   subtitle: {
     margin: 0,
     color: "#64748b",
     fontSize: "14px",
+    lineHeight: "1.5",
   },
 
   errorBox: {
@@ -600,6 +686,7 @@ const styles = {
     borderRadius: "10px",
     fontSize: "13px",
     marginBottom: "20px",
+    lineHeight: "1.4",
   },
 
   field: {
@@ -621,10 +708,13 @@ const styles = {
     borderRadius: "11px",
     background: "#ffffff",
     minHeight: "48px",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   inputIcon: {
     width: "45px",
+    flexShrink: 0,
     textAlign: "center",
     fontSize: "16px",
     opacity: 0.65,
@@ -632,6 +722,7 @@ const styles = {
 
   input: {
     flex: 1,
+    width: "100%",
     border: "none",
     outline: "none",
     background: "transparent",
@@ -639,16 +730,18 @@ const styles = {
     fontSize: "14px",
     color: "#1e293b",
     minWidth: 0,
+    boxSizing: "border-box",
   },
 
   passwordButton: {
+    flexShrink: 0,
     border: "none",
     background: "transparent",
     color: "#4f46e5",
     fontSize: "12px",
     fontWeight: "700",
     cursor: "pointer",
-    padding: "10px 14px",
+    padding: "10px 12px",
   },
 
   helperText: {
@@ -664,6 +757,10 @@ const styles = {
     gap: "10px",
   },
 
+  roleContainerMobile: {
+    gridTemplateColumns: "1fr",
+  },
+
   roleCard: {
     display: "flex",
     alignItems: "center",
@@ -675,6 +772,8 @@ const styles = {
     background: "#ffffff",
     cursor: "pointer",
     minWidth: 0,
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   roleCardSelected: {

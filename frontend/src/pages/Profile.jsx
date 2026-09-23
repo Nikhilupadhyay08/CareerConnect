@@ -17,6 +17,21 @@ function Profile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -118,7 +133,10 @@ function Profile() {
       <main style={styles.page}>
         <div style={styles.loadingContainer}>
           <div style={styles.spinner}></div>
-          <p style={styles.loadingText}>Loading profile...</p>
+
+          <p style={styles.loadingText}>
+            Loading profile...
+          </p>
         </div>
       </main>
     );
@@ -127,8 +145,8 @@ function Profile() {
   return (
     <main style={styles.page}>
       <div style={styles.container}>
+        {/* ================= HEADER ================= */}
 
-        {/* Header */}
         <div style={styles.pageHeader}>
           <div>
             <div style={styles.eyebrow}>ACCOUNT</div>
@@ -141,18 +159,31 @@ function Profile() {
           </div>
         </div>
 
-        {/* Main Card */}
+        {/* ================= MAIN CARD ================= */}
+
         <section style={styles.card}>
+          {/* PROFILE HEADER */}
 
-          {/* Profile Header */}
-          <div style={styles.profileHeader}>
-
+          <div
+            style={{
+              ...styles.profileHeader,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "flex-start" : "center",
+              padding: isMobile ? "24px 18px" : "32px",
+              gap: isMobile ? "15px" : "20px",
+            }}
+          >
             <div style={styles.avatar}>
               {getInitials(formData.name)}
             </div>
 
             <div style={styles.profileInfo}>
-              <h2 style={styles.profileName}>
+              <h2
+                style={{
+                  ...styles.profileName,
+                  fontSize: isMobile ? "21px" : "24px",
+                }}
+              >
                 {formData.name || "User"}
               </h2>
 
@@ -169,15 +200,22 @@ function Profile() {
 
           <div style={styles.divider}></div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit}>
+          {/* ================= PERSONAL INFORMATION ================= */}
 
-            <div style={styles.sectionHeader}>
+          <form onSubmit={handleSubmit}>
+            <div
+              style={{
+                ...styles.sectionHeader,
+                padding: isMobile
+                  ? "24px 18px 18px"
+                  : "30px 32px 22px",
+              }}
+            >
               <div style={styles.sectionIcon}>
                 👤
               </div>
 
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <h3 style={styles.sectionTitle}>
                   Personal Information
                 </h3>
@@ -189,26 +227,73 @@ function Profile() {
               </div>
             </div>
 
-            {/* Messages */}
+            {/* MESSAGES */}
+
             {error && (
-              <div style={styles.errorBox}>
-                <span style={styles.messageIcon}>!</span>
-                <span>{error}</span>
+              <div
+                style={{
+                  ...styles.errorBox,
+                  margin: isMobile
+                    ? "0 18px 20px"
+                    : "0 32px 20px",
+                }}
+              >
+                <span style={styles.messageIcon}>
+                  !
+                </span>
+
+                <span
+                  style={{
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {error}
+                </span>
               </div>
             )}
 
             {success && (
-              <div style={styles.successBox}>
-                <span style={styles.messageIcon}>✓</span>
-                <span>{success}</span>
+              <div
+                style={{
+                  ...styles.successBox,
+                  margin: isMobile
+                    ? "0 18px 20px"
+                    : "0 32px 20px",
+                }}
+              >
+                <span style={styles.messageIcon}>
+                  ✓
+                </span>
+
+                <span
+                  style={{
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {success}
+                </span>
               </div>
             )}
 
-            {/* Fields */}
-            <div style={styles.formGrid}>
+            {/* FIELDS */}
 
+            <div
+              style={{
+                ...styles.formGrid,
+                padding: isMobile
+                  ? "0 18px 24px"
+                  : "0 32px 30px",
+                gridTemplateColumns: isMobile
+                  ? "1fr"
+                  : "repeat(2, minmax(0, 1fr))",
+                gap: isMobile ? "18px" : "22px",
+              }}
+            >
               <div style={styles.formGroup}>
-                <label style={styles.label} htmlFor="name">
+                <label
+                  style={styles.label}
+                  htmlFor="name"
+                >
                   Full Name
                 </label>
 
@@ -220,14 +305,18 @@ function Profile() {
                   onChange={handleChange}
                   placeholder="Enter your full name"
                   style={styles.input}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#2563eb";
-                    e.target.style.boxShadow =
+                  onFocus={(event) => {
+                    event.target.style.borderColor =
+                      "#2563eb";
+
+                    event.target.style.boxShadow =
                       "0 0 0 3px rgba(37, 99, 235, 0.10)";
                   }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "#dbe3ef";
-                    e.target.style.boxShadow = "none";
+                  onBlur={(event) => {
+                    event.target.style.borderColor =
+                      "#dbe3ef";
+
+                    event.target.style.boxShadow = "none";
                   }}
                 />
 
@@ -238,7 +327,10 @@ function Profile() {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label} htmlFor="email">
+                <label
+                  style={styles.label}
+                  htmlFor="email"
+                >
                   Email Address
                 </label>
 
@@ -261,15 +353,28 @@ function Profile() {
               </div>
             </div>
 
-            {/* Account Information */}
-            <div style={styles.accountSection}>
+            {/* ================= ACCOUNT INFORMATION ================= */}
 
-              <div style={styles.accountHeader}>
+            <div
+              style={{
+                ...styles.accountSection,
+                margin: isMobile ? "0 18px" : "0 32px",
+                padding: isMobile
+                  ? "22px 0"
+                  : "26px 0",
+              }}
+            >
+              <div
+                style={{
+                  ...styles.accountHeader,
+                  marginBottom: isMobile ? "18px" : "22px",
+                }}
+              >
                 <div style={styles.sectionIcon}>
                   ⚙
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <h3 style={styles.sectionTitle}>
                     Account Information
                   </h3>
@@ -281,14 +386,27 @@ function Profile() {
                 </div>
               </div>
 
-              <div style={styles.accountGrid}>
-
+              <div
+                style={{
+                  ...styles.accountGrid,
+                  marginLeft: isMobile ? "0" : "51px",
+                  gridTemplateColumns: isMobile
+                    ? "1fr"
+                    : "repeat(2, minmax(0, 1fr))",
+                  gap: isMobile ? "12px" : "18px",
+                }}
+              >
                 <div style={styles.accountItem}>
                   <span style={styles.accountLabel}>
                     ACCOUNT TYPE
                   </span>
 
-                  <strong style={styles.accountValue}>
+                  <strong
+                    style={{
+                      ...styles.accountValue,
+                      overflowWrap: "anywhere",
+                    }}
+                  >
                     {getAccountType()}
                   </strong>
                 </div>
@@ -303,18 +421,25 @@ function Profile() {
                     Active
                   </strong>
                 </div>
-
               </div>
             </div>
 
-            {/* Actions */}
-            <div style={styles.actions}>
+            {/* ================= ACTIONS ================= */}
 
+            <div
+              style={{
+                ...styles.actions,
+                padding: isMobile
+                  ? "20px 18px 24px"
+                  : "24px 32px 30px",
+              }}
+            >
               <button
                 type="submit"
                 disabled={saving}
                 style={{
                   ...styles.saveButton,
+                  width: isMobile ? "100%" : "auto",
                   ...(saving
                     ? styles.saveButtonDisabled
                     : {}),
@@ -322,7 +447,9 @@ function Profile() {
               >
                 {saving ? (
                   <>
-                    <span style={styles.buttonSpinner}></span>
+                    <span
+                      style={styles.buttonSpinner}
+                    ></span>
                     Saving...
                   </>
                 ) : (
@@ -332,17 +459,25 @@ function Profile() {
                   </>
                 )}
               </button>
-
             </div>
-
           </form>
         </section>
 
-        {/* Bottom Note */}
-        <div style={styles.securityNote}>
-          <span style={styles.securityIcon}>🔒</span>
+        {/* ================= SECURITY NOTE ================= */}
 
-          <div>
+        <div
+          style={{
+            ...styles.securityNote,
+            padding: isMobile
+              ? "14px 15px"
+              : "16px 18px",
+          }}
+        >
+          <span style={styles.securityIcon}>
+            🔒
+          </span>
+
+          <div style={{ minWidth: 0 }}>
             <strong style={styles.securityTitle}>
               Your account information is secure
             </strong>
@@ -353,7 +488,6 @@ function Profile() {
             </p>
           </div>
         </div>
-
       </div>
     </main>
   );
@@ -366,12 +500,14 @@ const styles = {
       "linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%)",
     padding: "45px 24px 60px",
     boxSizing: "border-box",
+    overflowX: "hidden",
   },
 
   container: {
     width: "100%",
     maxWidth: "1050px",
     margin: "0 auto",
+    boxSizing: "border-box",
   },
 
   pageHeader: {
@@ -392,27 +528,29 @@ const styles = {
     lineHeight: "1.2",
     fontWeight: "800",
     color: "#0f172a",
+    overflowWrap: "anywhere",
   },
 
   subtitle: {
     margin: "9px 0 0",
     fontSize: "15px",
     color: "#64748b",
+    lineHeight: "1.5",
   },
 
   card: {
+    width: "100%",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "20px",
-    boxShadow: "0 15px 40px rgba(15, 23, 42, 0.07)",
+    boxShadow:
+      "0 15px 40px rgba(15, 23, 42, 0.07)",
     overflow: "hidden",
+    boxSizing: "border-box",
   },
 
   profileHeader: {
-    padding: "32px",
     display: "flex",
-    alignItems: "center",
-    gap: "20px",
   },
 
   avatar: {
@@ -439,9 +577,9 @@ const styles = {
 
   profileName: {
     margin: 0,
-    fontSize: "24px",
     fontWeight: "800",
     color: "#0f172a",
+    overflowWrap: "anywhere",
   },
 
   profileEmail: {
@@ -461,11 +599,14 @@ const styles = {
     color: "#1d4ed8",
     fontSize: "12px",
     fontWeight: "700",
+    maxWidth: "100%",
+    boxSizing: "border-box",
   },
 
   roleDot: {
     width: "7px",
     height: "7px",
+    flexShrink: 0,
     borderRadius: "50%",
     background: "#2563eb",
   },
@@ -476,7 +617,6 @@ const styles = {
   },
 
   sectionHeader: {
-    padding: "30px 32px 22px",
     display: "flex",
     alignItems: "flex-start",
     gap: "13px",
@@ -510,7 +650,6 @@ const styles = {
   },
 
   errorBox: {
-    margin: "0 32px 20px",
     padding: "12px 14px",
     borderRadius: "10px",
     border: "1px solid #fecaca",
@@ -521,10 +660,10 @@ const styles = {
     gap: "9px",
     fontSize: "13px",
     fontWeight: "600",
+    boxSizing: "border-box",
   },
 
   successBox: {
-    margin: "0 32px 20px",
     padding: "12px 14px",
     borderRadius: "10px",
     border: "1px solid #bbf7d0",
@@ -535,6 +674,7 @@ const styles = {
     gap: "9px",
     fontSize: "13px",
     fontWeight: "600",
+    boxSizing: "border-box",
   },
 
   messageIcon: {
@@ -551,16 +691,14 @@ const styles = {
   },
 
   formGrid: {
-    padding: "0 32px 30px",
     display: "grid",
-    gridTemplateColumns:
-      "repeat(2, minmax(0, 1fr))",
-    gap: "22px",
+    boxSizing: "border-box",
   },
 
   formGroup: {
     display: "flex",
     flexDirection: "column",
+    minWidth: 0,
   },
 
   label: {
@@ -599,8 +737,7 @@ const styles = {
   },
 
   accountSection: {
-    margin: "0 32px",
-    padding: "26px 0",
+    boxSizing: "border-box",
     borderTop: "1px solid #e2e8f0",
     borderBottom: "1px solid #e2e8f0",
   },
@@ -609,18 +746,15 @@ const styles = {
     display: "flex",
     alignItems: "flex-start",
     gap: "13px",
-    marginBottom: "22px",
   },
 
   accountGrid: {
-    marginLeft: "51px",
     display: "grid",
-    gridTemplateColumns:
-      "repeat(2, minmax(0, 1fr))",
-    gap: "18px",
+    boxSizing: "border-box",
   },
 
   accountItem: {
+    minWidth: 0,
     padding: "16px",
     border: "1px solid #e2e8f0",
     borderRadius: "12px",
@@ -628,6 +762,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "7px",
+    boxSizing: "border-box",
   },
 
   accountLabel: {
@@ -653,14 +788,15 @@ const styles = {
   activeDot: {
     width: "8px",
     height: "8px",
+    flexShrink: 0,
     borderRadius: "50%",
     background: "#22c55e",
   },
 
   actions: {
-    padding: "24px 32px 30px",
     display: "flex",
     justifyContent: "flex-end",
+    boxSizing: "border-box",
   },
 
   saveButton: {
@@ -681,6 +817,7 @@ const styles = {
     cursor: "pointer",
     boxShadow:
       "0 8px 18px rgba(37, 99, 235, 0.20)",
+    boxSizing: "border-box",
   },
 
   saveButtonDisabled: {
@@ -696,21 +833,23 @@ const styles = {
     borderTopColor: "#ffffff",
     borderRadius: "50%",
     display: "inline-block",
+    flexShrink: 0,
   },
 
   securityNote: {
     marginTop: "18px",
-    padding: "16px 18px",
     borderRadius: "12px",
     border: "1px solid #dbeafe",
     background: "#eff6ff",
     display: "flex",
     alignItems: "flex-start",
     gap: "11px",
+    boxSizing: "border-box",
   },
 
   securityIcon: {
     fontSize: "17px",
+    flexShrink: 0,
   },
 
   securityTitle: {
@@ -733,6 +872,8 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    padding: "20px",
+    boxSizing: "border-box",
   },
 
   spinner: {
@@ -748,6 +889,7 @@ const styles = {
     margin: 0,
     fontSize: "14px",
     color: "#64748b",
+    textAlign: "center",
   },
 };
 

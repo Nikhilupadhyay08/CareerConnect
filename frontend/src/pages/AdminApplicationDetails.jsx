@@ -10,6 +10,21 @@ const AdminApplicationDetails = () => {
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -50,8 +65,7 @@ const AdminApplicationDetails = () => {
         setApplication(foundApplication);
       } catch (error) {
         setError(
-          error.message ||
-            "Something went wrong"
+          error.message || "Something went wrong"
         );
       } finally {
         setLoading(false);
@@ -61,36 +75,18 @@ const AdminApplicationDetails = () => {
     fetchApplication();
   }, [id]);
 
-  const formatDate = (date) => {
-    if (!date) {
-      return "N/A";
-    }
-
-    return new Date(date).toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  };
-
   const formatDateTime = (date) => {
     if (!date) {
       return "N/A";
     }
 
-    return new Date(date).toLocaleString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
+    return new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const getStatusStyle = (status) => {
@@ -128,9 +124,7 @@ const AdminApplicationDetails = () => {
     return (
       <div style={styles.page}>
         <div style={styles.container}>
-          <div style={styles.error}>
-            {error}
-          </div>
+          <div style={styles.error}>{error}</div>
 
           <Link
             to="/admin/applications"
@@ -150,8 +144,8 @@ const AdminApplicationDetails = () => {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-
         {/* Back */}
+
         <Link
           to="/admin/applications"
           style={styles.backLink}
@@ -160,13 +154,22 @@ const AdminApplicationDetails = () => {
         </Link>
 
         {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <p style={styles.label}>
-              ADMIN PANEL
-            </p>
 
-            <h1 style={styles.title}>
+        <div
+          style={{
+            ...styles.header,
+            marginBottom: isMobile ? "22px" : "30px",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <p style={styles.label}>ADMIN PANEL</p>
+
+            <h1
+              style={{
+                ...styles.title,
+                fontSize: isMobile ? "27px" : "34px",
+              }}
+            >
               Application Details
             </h1>
 
@@ -177,19 +180,35 @@ const AdminApplicationDetails = () => {
           </div>
 
           <span
-            style={getStatusStyle(
-              application.status
-            )}
+            style={{
+              ...getStatusStyle(application.status),
+              alignSelf: isMobile
+                ? "flex-start"
+                : "auto",
+            }}
           >
             {application.status || "Unknown"}
           </span>
         </div>
 
         {/* Applicant + Job */}
-        <div style={styles.grid}>
 
+        <div
+          style={{
+            ...styles.grid,
+            gridTemplateColumns: isMobile
+              ? "1fr"
+              : "repeat(auto-fit, minmax(320px, 1fr))",
+          }}
+        >
           {/* Applicant */}
-          <div style={styles.card}>
+
+          <div
+            style={{
+              ...styles.card,
+              padding: isMobile ? "18px" : "24px",
+            }}
+          >
             <h2 style={styles.cardTitle}>
               Applicant Information
             </h2>
@@ -201,7 +220,7 @@ const AdminApplicationDetails = () => {
                   ?.toUpperCase() || "U"}
               </div>
 
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <div style={styles.name}>
                   {application.applicant?.name ||
                     "N/A"}
@@ -215,12 +234,30 @@ const AdminApplicationDetails = () => {
             </div>
 
             <div style={styles.infoList}>
-              <div style={styles.infoItem}>
+              <div
+                style={{
+                  ...styles.infoItem,
+                  flexDirection: isMobile
+                    ? "column"
+                    : "row",
+                  gap: isMobile ? "5px" : "20px",
+                }}
+              >
                 <span style={styles.infoLabel}>
                   Applicant ID
                 </span>
 
-                <span style={styles.idValue}>
+                <span
+                  style={{
+                    ...styles.idValue,
+                    textAlign: isMobile
+                      ? "left"
+                      : "right",
+                    maxWidth: isMobile
+                      ? "100%"
+                      : "250px",
+                  }}
+                >
                   {application.applicant?._id ||
                     "N/A"}
                 </span>
@@ -229,7 +266,13 @@ const AdminApplicationDetails = () => {
           </div>
 
           {/* Job */}
-          <div style={styles.card}>
+
+          <div
+            style={{
+              ...styles.card,
+              padding: isMobile ? "18px" : "24px",
+            }}
+          >
             <h2 style={styles.cardTitle}>
               Job Information
             </h2>
@@ -237,68 +280,144 @@ const AdminApplicationDetails = () => {
             {application.job ? (
               <>
                 <div style={styles.jobTitle}>
-                  {application.job.title ||
-                    "N/A"}
+                  {application.job.title || "N/A"}
                 </div>
 
                 <div style={styles.company}>
-                  {application.job.company ||
-                    "N/A"}
+                  {application.job.company || "N/A"}
                 </div>
 
                 <div style={styles.infoList}>
-                  <div style={styles.infoItem}>
+                  <div
+                    style={{
+                      ...styles.infoItem,
+                      flexDirection: isMobile
+                        ? "column"
+                        : "row",
+                      gap: isMobile ? "5px" : "20px",
+                    }}
+                  >
                     <span style={styles.infoLabel}>
                       Location
                     </span>
 
-                    <span style={styles.infoValue}>
+                    <span
+                      style={{
+                        ...styles.infoValue,
+                        textAlign: isMobile
+                          ? "left"
+                          : "right",
+                      }}
+                    >
                       {application.job.location ||
                         "N/A"}
                     </span>
                   </div>
 
-                  <div style={styles.infoItem}>
+                  <div
+                    style={{
+                      ...styles.infoItem,
+                      flexDirection: isMobile
+                        ? "column"
+                        : "row",
+                      gap: isMobile ? "5px" : "20px",
+                    }}
+                  >
                     <span style={styles.infoLabel}>
                       Job Type
                     </span>
 
-                    <span style={styles.infoValue}>
+                    <span
+                      style={{
+                        ...styles.infoValue,
+                        textAlign: isMobile
+                          ? "left"
+                          : "right",
+                      }}
+                    >
                       {application.job.jobType ||
                         "N/A"}
                     </span>
                   </div>
 
-                  <div style={styles.infoItem}>
+                  <div
+                    style={{
+                      ...styles.infoItem,
+                      flexDirection: isMobile
+                        ? "column"
+                        : "row",
+                      gap: isMobile ? "5px" : "20px",
+                    }}
+                  >
                     <span style={styles.infoLabel}>
                       Employer
                     </span>
 
-                    <span style={styles.infoValue}>
+                    <span
+                      style={{
+                        ...styles.infoValue,
+                        textAlign: isMobile
+                          ? "left"
+                          : "right",
+                      }}
+                    >
                       {application.job.employer
                         ?.name || "N/A"}
                     </span>
                   </div>
 
-                  <div style={styles.infoItem}>
+                  <div
+                    style={{
+                      ...styles.infoItem,
+                      flexDirection: isMobile
+                        ? "column"
+                        : "row",
+                      gap: isMobile ? "5px" : "20px",
+                    }}
+                  >
                     <span style={styles.infoLabel}>
                       Employer Email
                     </span>
 
-                    <span style={styles.infoValue}>
+                    <span
+                      style={{
+                        ...styles.infoValue,
+                        textAlign: isMobile
+                          ? "left"
+                          : "right",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
                       {application.job.employer
                         ?.email || "N/A"}
                     </span>
                   </div>
 
-                  <div style={styles.infoItem}>
+                  <div
+                    style={{
+                      ...styles.infoItem,
+                      flexDirection: isMobile
+                        ? "column"
+                        : "row",
+                      gap: isMobile ? "5px" : "20px",
+                    }}
+                  >
                     <span style={styles.infoLabel}>
                       Job ID
                     </span>
 
-                    <span style={styles.idValue}>
-                      {application.job._id ||
-                        "N/A"}
+                    <span
+                      style={{
+                        ...styles.idValue,
+                        textAlign: isMobile
+                          ? "left"
+                          : "right",
+                        maxWidth: isMobile
+                          ? "100%"
+                          : "250px",
+                      }}
+                    >
+                      {application.job._id || "N/A"}
                     </span>
                   </div>
                 </div>
@@ -313,57 +432,123 @@ const AdminApplicationDetails = () => {
         </div>
 
         {/* Application Information */}
-        <div style={styles.card}>
+
+        <div
+          style={{
+            ...styles.card,
+            padding: isMobile ? "18px" : "24px",
+          }}
+        >
           <h2 style={styles.cardTitle}>
             Application Information
           </h2>
 
           <div style={styles.infoList}>
-            <div style={styles.infoItem}>
+            <div
+              style={{
+                ...styles.infoItem,
+                flexDirection: isMobile
+                  ? "column"
+                  : "row",
+                gap: isMobile ? "5px" : "20px",
+              }}
+            >
               <span style={styles.infoLabel}>
                 Application Status
               </span>
 
               <span
-                style={getStatusStyle(
-                  application.status
-                )}
+                style={{
+                  ...getStatusStyle(
+                    application.status
+                  ),
+                  alignSelf: isMobile
+                    ? "flex-start"
+                    : "auto",
+                }}
               >
-                {application.status ||
-                  "Unknown"}
+                {application.status || "Unknown"}
               </span>
             </div>
 
-            <div style={styles.infoItem}>
+            <div
+              style={{
+                ...styles.infoItem,
+                flexDirection: isMobile
+                  ? "column"
+                  : "row",
+                gap: isMobile ? "5px" : "20px",
+              }}
+            >
               <span style={styles.infoLabel}>
                 Applied On
               </span>
 
-              <span style={styles.infoValue}>
+              <span
+                style={{
+                  ...styles.infoValue,
+                  textAlign: isMobile
+                    ? "left"
+                    : "right",
+                }}
+              >
                 {formatDateTime(
                   application.createdAt
                 )}
               </span>
             </div>
 
-            <div style={styles.infoItem}>
+            <div
+              style={{
+                ...styles.infoItem,
+                flexDirection: isMobile
+                  ? "column"
+                  : "row",
+                gap: isMobile ? "5px" : "20px",
+              }}
+            >
               <span style={styles.infoLabel}>
                 Last Updated
               </span>
 
-              <span style={styles.infoValue}>
+              <span
+                style={{
+                  ...styles.infoValue,
+                  textAlign: isMobile
+                    ? "left"
+                    : "right",
+                }}
+              >
                 {formatDateTime(
                   application.updatedAt
                 )}
               </span>
             </div>
 
-            <div style={styles.infoItem}>
+            <div
+              style={{
+                ...styles.infoItem,
+                flexDirection: isMobile
+                  ? "column"
+                  : "row",
+                gap: isMobile ? "5px" : "20px",
+              }}
+            >
               <span style={styles.infoLabel}>
                 Application ID
               </span>
 
-              <span style={styles.idValue}>
+              <span
+                style={{
+                  ...styles.idValue,
+                  textAlign: isMobile
+                    ? "left"
+                    : "right",
+                  maxWidth: isMobile
+                    ? "100%"
+                    : "250px",
+                }}
+              >
                 {application._id}
               </span>
             </div>
@@ -371,14 +556,29 @@ const AdminApplicationDetails = () => {
         </div>
 
         {/* Resume */}
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>
-            Resume
-          </h2>
+
+        <div
+          style={{
+            ...styles.card,
+            padding: isMobile ? "18px" : "24px",
+          }}
+        >
+          <h2 style={styles.cardTitle}>Resume</h2>
 
           {application.resume ? (
-            <div style={styles.resumeBox}>
-              <div>
+            <div
+              style={{
+                ...styles.resumeBox,
+                flexDirection: isMobile
+                  ? "column"
+                  : "row",
+                alignItems: isMobile
+                  ? "stretch"
+                  : "center",
+                gap: isMobile ? "14px" : "20px",
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
                 <div style={styles.resumeTitle}>
                   Resume submitted
                 </div>
@@ -393,7 +593,14 @@ const AdminApplicationDetails = () => {
                 href={application.resume}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={styles.resumeButton}
+                style={{
+                  ...styles.resumeButton,
+                  width: isMobile
+                    ? "100%"
+                    : "auto",
+                  boxSizing: "border-box",
+                  textAlign: "center",
+                }}
               >
                 View Resume
               </a>
@@ -405,7 +612,6 @@ const AdminApplicationDetails = () => {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
@@ -416,11 +622,15 @@ const styles = {
     minHeight: "calc(100vh - 140px)",
     background: "#f8fafc",
     padding: "40px 20px 60px",
+    boxSizing: "border-box",
+    overflowX: "hidden",
   },
 
   container: {
+    width: "100%",
     maxWidth: "1100px",
     margin: "0 auto",
+    boxSizing: "border-box",
   },
 
   backLink: {
@@ -436,8 +646,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    gap: "20px",
-    marginBottom: "30px",
+    gap: "16px",
     flexWrap: "wrap",
   },
 
@@ -451,33 +660,35 @@ const styles = {
 
   title: {
     margin: "6px 0 8px",
-    fontSize: "34px",
     fontWeight: "800",
     color: "#0f172a",
+    lineHeight: "1.2",
   },
 
   subtitle: {
     margin: 0,
-    fontSize: "16px",
+    fontSize: "15px",
+    lineHeight: "1.5",
     color: "#64748b",
+    maxWidth: "700px",
   },
 
   grid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(320px, 1fr))",
     gap: "20px",
-    marginBottom: "20px",
+    marginBottom: "0",
   },
 
   card: {
+    width: "100%",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "16px",
-    padding: "24px",
     marginBottom: "20px",
     boxShadow:
       "0 4px 12px rgba(15, 23, 42, 0.05)",
+    boxSizing: "border-box",
+    minWidth: 0,
   },
 
   cardTitle: {
@@ -492,11 +703,13 @@ const styles = {
     alignItems: "center",
     gap: "14px",
     marginBottom: "25px",
+    minWidth: 0,
   },
 
   avatar: {
     width: "50px",
     height: "50px",
+    flexShrink: 0,
     borderRadius: "50%",
     background: "#dbeafe",
     color: "#2563eb",
@@ -512,11 +725,13 @@ const styles = {
     fontWeight: "700",
     color: "#0f172a",
     marginBottom: "4px",
+    overflowWrap: "anywhere",
   },
 
   email: {
     fontSize: "13px",
     color: "#64748b",
+    overflowWrap: "anywhere",
   },
 
   jobTitle: {
@@ -524,12 +739,14 @@ const styles = {
     fontWeight: "700",
     color: "#0f172a",
     marginBottom: "5px",
+    overflowWrap: "anywhere",
   },
 
   company: {
     fontSize: "14px",
     color: "#64748b",
     marginBottom: "22px",
+    overflowWrap: "anywhere",
   },
 
   infoList: {
@@ -542,28 +759,27 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    gap: "20px",
     paddingBottom: "12px",
     borderBottom: "1px solid #f1f5f9",
+    minWidth: 0,
   },
 
   infoLabel: {
     color: "#64748b",
     fontSize: "14px",
+    flexShrink: 0,
   },
 
   infoValue: {
     color: "#0f172a",
     fontSize: "14px",
     fontWeight: "600",
-    textAlign: "right",
+    overflowWrap: "anywhere",
   },
 
   idValue: {
     color: "#64748b",
     fontSize: "12px",
-    textAlign: "right",
-    maxWidth: "250px",
     wordBreak: "break-all",
   },
 
@@ -625,12 +841,10 @@ const styles = {
   resumeBox: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
-    gap: "20px",
     padding: "18px",
     border: "1px solid #e2e8f0",
     borderRadius: "12px",
-    flexWrap: "wrap",
+    boxSizing: "border-box",
   },
 
   resumeTitle: {
@@ -642,6 +856,7 @@ const styles = {
 
   resumeSubtitle: {
     fontSize: "13px",
+    lineHeight: "1.5",
     color: "#64748b",
   },
 
@@ -680,6 +895,7 @@ const styles = {
     color: "#b91c1c",
     textAlign: "center",
     marginBottom: "20px",
+    overflowWrap: "anywhere",
   },
 };
 

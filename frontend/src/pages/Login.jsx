@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { loginUser } from "../services/api";
@@ -16,6 +16,21 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // ==================== HANDLERS ====================
 
@@ -51,7 +66,6 @@ function Login() {
 
       login(data);
 
-      // Redirect according to user role
       if (data.user.role === "admin") {
         navigate("/admin");
       } else if (data.user.role === "employer") {
@@ -70,63 +84,99 @@ function Login() {
   };
 
   return (
-    <div style={styles.page}>
+    <div
+      style={{
+        ...styles.page,
+        ...(isMobile ? styles.mobilePage : {}),
+      }}
+    >
       {/* Background Decorations */}
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          ...(isMobile ? styles.mobileContainer : {}),
+        }}
+      >
         {/* ==================== LEFT SIDE ==================== */}
 
-        <div style={styles.brandSection}>
-          <div style={styles.brandContent}>
-            <div style={styles.badge}>
-              👋 Welcome back
-            </div>
+        {!isMobile && (
+          <div style={styles.brandSection}>
+            <div style={styles.brandContent}>
+              <div style={styles.badge}>
+                👋 Welcome back
+              </div>
 
-            <h1 style={styles.brandHeading}>
-              Your next
-              <br />
-              opportunity is{" "}
-              <span style={styles.highlight}>
-                waiting.
-              </span>
-            </h1>
+              <h1 style={styles.brandHeading}>
+                Your next
+                <br />
+                opportunity is{" "}
+                <span style={styles.highlight}>
+                  waiting.
+                </span>
+              </h1>
 
-            <p style={styles.brandDescription}>
-              Sign in to CareerConnect and continue
-              exploring opportunities, managing
-              applications, and building your career.
-            </p>
+              <p style={styles.brandDescription}>
+                Sign in to CareerConnect and continue
+                exploring opportunities, managing
+                applications, and building your career.
+              </p>
 
-            <div style={styles.features}>
-              <Feature
-                icon="💼"
-                title="Explore opportunities"
-                description="Discover jobs that match your skills and career goals."
-              />
+              <div style={styles.features}>
+                <Feature
+                  icon="💼"
+                  title="Explore opportunities"
+                  description="Discover jobs that match your skills and career goals."
+                />
 
-              <Feature
-                icon="📄"
-                title="Manage applications"
-                description="Keep track of your applications in one place."
-              />
+                <Feature
+                  icon="📄"
+                  title="Manage applications"
+                  description="Keep track of your applications in one place."
+                />
 
-              <Feature
-                icon="🚀"
-                title="Keep moving forward"
-                description="Take the next step toward your professional goals."
-              />
+                <Feature
+                  icon="🚀"
+                  title="Keep moving forward"
+                  description="Take the next step toward your professional goals."
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* ==================== RIGHT SIDE ==================== */}
 
-        <div style={styles.formSection}>
-          <div style={styles.formCard}>
+        <div
+          style={{
+            ...styles.formSection,
+            ...(isMobile ? styles.mobileFormSection : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.formCard,
+              ...(isMobile ? styles.mobileFormCard : {}),
+            }}
+          >
             <div style={styles.formHeader}>
-              <h2 style={styles.title}>
+              <div
+                style={{
+                  ...styles.mobileLoginBadge,
+                  display: isMobile ? "inline-block" : "none",
+                }}
+              >
+                🔐 Secure Login
+              </div>
+
+              <h2
+                style={{
+                  ...styles.title,
+                  ...(isMobile ? styles.mobileTitle : {}),
+                }}
+              >
                 Welcome back
               </h2>
 
@@ -136,6 +186,7 @@ function Login() {
             </div>
 
             {/* Error Message */}
+
             {error && (
               <div style={styles.errorBox}>
                 <span>⚠</span>
@@ -312,6 +363,13 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     padding: "50px 24px",
+    boxSizing: "border-box",
+  },
+
+  mobilePage: {
+    minHeight: "calc(100vh - 70px)",
+    padding: "24px 16px 40px",
+    overflow: "visible",
   },
 
   backgroundShapeOne: {
@@ -322,6 +380,7 @@ const styles = {
     background: "rgba(99, 102, 241, 0.08)",
     top: "-180px",
     left: "-150px",
+    pointerEvents: "none",
   },
 
   backgroundShapeTwo: {
@@ -332,6 +391,7 @@ const styles = {
     background: "rgba(59, 130, 246, 0.07)",
     bottom: "-150px",
     right: "-100px",
+    pointerEvents: "none",
   },
 
   container: {
@@ -343,6 +403,12 @@ const styles = {
     alignItems: "center",
     position: "relative",
     zIndex: 1,
+  },
+
+  mobileContainer: {
+    display: "block",
+    width: "100%",
+    maxWidth: "100%",
   },
 
   brandSection: {
@@ -408,6 +474,7 @@ const styles = {
     fontSize: "20px",
     boxShadow:
       "0 5px 15px rgba(15, 23, 42, 0.07)",
+    flexShrink: 0,
   },
 
   featureTitle: {
@@ -427,6 +494,12 @@ const styles = {
     width: "100%",
   },
 
+  mobileFormSection: {
+    width: "100%",
+    maxWidth: "500px",
+    margin: "0 auto",
+  },
+
   formCard: {
     background: "#ffffff",
     borderRadius: "24px",
@@ -435,6 +508,25 @@ const styles = {
       "0 20px 60px rgba(15, 23, 42, 0.10)",
     border:
       "1px solid rgba(226, 232, 240, 0.8)",
+    boxSizing: "border-box",
+  },
+
+  mobileFormCard: {
+    width: "100%",
+    padding: "24px 20px",
+    borderRadius: "20px",
+    boxShadow:
+      "0 12px 35px rgba(15, 23, 42, 0.08)",
+  },
+
+  mobileLoginBadge: {
+    background: "#eef2ff",
+    color: "#4f46e5",
+    padding: "7px 11px",
+    borderRadius: "999px",
+    fontSize: "11px",
+    fontWeight: "700",
+    marginBottom: "13px",
   },
 
   formHeader: {
@@ -449,10 +541,15 @@ const styles = {
     letterSpacing: "-0.6px",
   },
 
+  mobileTitle: {
+    fontSize: "25px",
+  },
+
   subtitle: {
     margin: 0,
     color: "#64748b",
     fontSize: "14px",
+    lineHeight: "1.5",
   },
 
   errorBox: {
@@ -483,14 +580,18 @@ const styles = {
   inputWrapper: {
     display: "flex",
     alignItems: "center",
+    width: "100%",
     border: "1px solid #dbe2ea",
     borderRadius: "11px",
     background: "#ffffff",
     minHeight: "48px",
+    boxSizing: "border-box",
+    overflow: "hidden",
   },
 
   inputIcon: {
     width: "45px",
+    minWidth: "45px",
     textAlign: "center",
     fontSize: "16px",
     opacity: 0.65,
@@ -498,13 +599,15 @@ const styles = {
 
   input: {
     flex: 1,
+    width: "100%",
+    minWidth: 0,
     border: "none",
     outline: "none",
     background: "transparent",
     padding: "13px 10px 13px 0",
     fontSize: "14px",
     color: "#1e293b",
-    minWidth: 0,
+    boxSizing: "border-box",
   },
 
   passwordButton: {
@@ -515,6 +618,7 @@ const styles = {
     fontWeight: "700",
     cursor: "pointer",
     padding: "10px 14px",
+    flexShrink: 0,
   },
 
   submitButton: {
@@ -535,6 +639,7 @@ const styles = {
     gap: "8px",
     boxShadow:
       "0 8px 20px rgba(79, 70, 229, 0.20)",
+    boxSizing: "border-box",
   },
 
   submitButtonDisabled: {

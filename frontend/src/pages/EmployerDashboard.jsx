@@ -14,8 +14,22 @@ function EmployerDashboard() {
   const [applicantCounts, setApplicantCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
 
-  // Fetch employer jobs and applicant counts
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const fetchMyJobs = async () => {
     try {
       setLoading(true);
@@ -68,7 +82,6 @@ function EmployerDashboard() {
     }
   }, [token]);
 
-  // Delete job
   const handleDelete = async (jobId) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this job?"
@@ -99,7 +112,6 @@ function EmployerDashboard() {
     }
   };
 
-  // Statistics
   const totalJobs = jobs.length;
 
   const fullTimeJobs = jobs.filter(
@@ -110,25 +122,44 @@ function EmployerDashboard() {
     (job) => job.jobType === "Internship"
   ).length;
 
-  const totalApplicants = Object.values(
-    applicantCounts
-  ).reduce((total, count) => total + count, 0);
+  const totalApplicants = Object.values(applicantCounts).reduce(
+    (total, count) => total + count,
+    0
+  );
 
   return (
     <main style={styles.page}>
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          padding: isMobile ? "30px 16px 0" : "45px 24px 0",
+        }}
+      >
         {/* ================= HEADER ================= */}
 
-        <section style={styles.header}>
-          <div>
+        <section
+          style={{
+            ...styles.header,
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "stretch" : "flex-end",
+            gap: isMobile ? "20px" : "30px",
+            marginBottom: isMobile ? "25px" : "30px",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
             <span style={styles.sectionLabel}>
               EMPLOYER DASHBOARD
             </span>
 
-            <h1 style={styles.heading}>
+            <h1
+              style={{
+                ...styles.heading,
+                fontSize: isMobile ? "28px" : "36px",
+              }}
+            >
               Welcome back, {user?.name}
             </h1>
 
@@ -140,7 +171,10 @@ function EmployerDashboard() {
 
           <button
             type="button"
-            style={styles.primaryButton}
+            style={{
+              ...styles.primaryButton,
+              width: isMobile ? "100%" : "auto",
+            }}
             onClick={() =>
               navigate("/employer/create-job")
             }
@@ -152,37 +186,57 @@ function EmployerDashboard() {
 
         {/* ================= STATISTICS ================= */}
 
-        <section style={styles.statsGrid}>
+        <section
+          style={{
+            ...styles.statsGrid,
+            gridTemplateColumns: isMobile
+              ? "repeat(2, minmax(0, 1fr))"
+              : "repeat(4, minmax(0, 1fr))",
+            gap: isMobile ? "10px" : "14px",
+            marginBottom: isMobile ? "28px" : "35px",
+          }}
+        >
           <StatCard
             icon="💼"
             label="Total Jobs"
             value={totalJobs}
+            isMobile={isMobile}
           />
 
           <StatCard
             icon="🏢"
             label="Full-time Jobs"
             value={fullTimeJobs}
+            isMobile={isMobile}
           />
 
           <StatCard
             icon="🎓"
             label="Internships"
             value={internshipJobs}
+            isMobile={isMobile}
           />
 
           <StatCard
             icon="👥"
             label="Total Applicants"
             value={totalApplicants}
+            isMobile={isMobile}
           />
         </section>
 
         {/* ================= JOBS ================= */}
 
         <section style={styles.jobsSection}>
-          <div style={styles.sectionHeader}>
-            <div>
+          <div
+            style={{
+              ...styles.sectionHeader,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "flex-start" : "flex-end",
+              gap: isMobile ? "12px" : "20px",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
               <span style={styles.sectionLabel}>
                 JOB MANAGEMENT
               </span>
@@ -203,6 +257,7 @@ function EmployerDashboard() {
           </div>
 
           {/* Loading */}
+
           {loading && (
             <div style={styles.messageCard}>
               <div style={styles.loadingSpinner}></div>
@@ -218,11 +273,10 @@ function EmployerDashboard() {
           )}
 
           {/* Error */}
+
           {!loading && error && (
             <div style={styles.messageCard}>
-              <div style={styles.messageIcon}>
-                ⚠️
-              </div>
+              <div style={styles.messageIcon}>⚠️</div>
 
               <h3 style={styles.messageTitle}>
                 Unable to load jobs
@@ -243,6 +297,7 @@ function EmployerDashboard() {
           )}
 
           {/* Empty */}
+
           {!loading &&
             !error &&
             jobs.length === 0 && (
@@ -273,6 +328,7 @@ function EmployerDashboard() {
             )}
 
           {/* Job Cards */}
+
           {!loading &&
             !error &&
             jobs.length > 0 && (
@@ -284,10 +340,25 @@ function EmployerDashboard() {
                   return (
                     <article
                       key={job._id}
-                      style={styles.jobCard}
+                      style={{
+                        ...styles.jobCard,
+                        padding: isMobile ? "17px" : "22px",
+                      }}
                     >
                       {/* Job Header */}
-                      <div style={styles.jobHeader}>
+
+                      <div
+                        style={{
+                          ...styles.jobHeader,
+                          flexDirection: isMobile
+                            ? "column"
+                            : "row",
+                          alignItems: isMobile
+                            ? "flex-start"
+                            : "center",
+                          gap: isMobile ? "12px" : "20px",
+                        }}
+                      >
                         <div style={styles.jobIdentity}>
                           <div style={styles.companyIcon}>
                             {job.company
@@ -297,8 +368,24 @@ function EmployerDashboard() {
                               : "C"}
                           </div>
 
-                          <div style={styles.jobIdentityText}>
-                            <h3 style={styles.jobTitle}>
+                          <div
+                            style={styles.jobIdentityText}
+                          >
+                            <h3
+                              style={{
+                                ...styles.jobTitle,
+                                whiteSpace: isMobile
+                                  ? "normal"
+                                  : "nowrap",
+                                overflow: isMobile
+                                  ? "visible"
+                                  : "hidden",
+                                textOverflow: isMobile
+                                  ? "clip"
+                                  : "ellipsis",
+                                overflowWrap: "anywhere",
+                              }}
+                            >
                               {job.title}
                             </h3>
 
@@ -308,20 +395,24 @@ function EmployerDashboard() {
                           </div>
                         </div>
 
-                        <span style={styles.jobTypeBadge}>
+                        <span
+                          style={{
+                            ...styles.jobTypeBadge,
+                            alignSelf: isMobile
+                              ? "flex-start"
+                              : "auto",
+                          }}
+                        >
                           {job.jobType}
                         </span>
                       </div>
 
                       {/* Job Meta */}
-                      <div style={styles.metaRow}>
-                        <span>
-                          📍 {job.location}
-                        </span>
 
-                        <span>
-                          💰 {job.salary}
-                        </span>
+                      <div style={styles.metaRow}>
+                        <span>📍 {job.location}</span>
+
+                        <span>💰 {job.salary}</span>
 
                         <span>
                           👥 {applicantCount}{" "}
@@ -343,40 +434,76 @@ function EmployerDashboard() {
                       </div>
 
                       {/* Description */}
+
                       <p style={styles.jobDescription}>
                         {job.description}
                       </p>
 
                       {/* Requirements */}
+
                       {job.requirements &&
                         job.requirements.length > 0 && (
                           <div style={styles.skillsSection}>
                             {job.requirements
                               .slice(0, 5)
-                              .map((requirement, index) => (
-                                <span
-                                  key={index}
-                                  style={styles.skillTag}
-                                >
-                                  {requirement}
-                                </span>
-                              ))}
+                              .map(
+                                (requirement, index) => (
+                                  <span
+                                    key={index}
+                                    style={styles.skillTag}
+                                  >
+                                    {requirement}
+                                  </span>
+                                )
+                              )}
                           </div>
                         )}
 
                       {/* Actions */}
-                      <div style={styles.jobFooter}>
+
+                      <div
+                        style={{
+                          ...styles.jobFooter,
+                          flexDirection: isMobile
+                            ? "column"
+                            : "row",
+                          alignItems: isMobile
+                            ? "stretch"
+                            : "center",
+                        }}
+                      >
                         <Link
                           to={`/jobs/${job._id}`}
-                          style={styles.viewJobButton}
+                          style={{
+                            ...styles.viewJobButton,
+                            width: isMobile
+                              ? "100%"
+                              : "auto",
+                            boxSizing: "border-box",
+                          }}
                         >
                           View Job →
                         </Link>
 
-                        <div style={styles.actionGroup}>
+                        <div
+                          style={{
+                            ...styles.actionGroup,
+                            width: isMobile
+                              ? "100%"
+                              : "auto",
+                            flexDirection: isMobile
+                              ? "column"
+                              : "row",
+                          }}
+                        >
                           <button
                             type="button"
-                            style={styles.editButton}
+                            style={{
+                              ...styles.editButton,
+                              width: isMobile
+                                ? "100%"
+                                : "auto",
+                            }}
                             onClick={() =>
                               navigate(
                                 `/employer/edit-job/${job._id}`
@@ -388,7 +515,12 @@ function EmployerDashboard() {
 
                           <button
                             type="button"
-                            style={styles.applicantsButton}
+                            style={{
+                              ...styles.applicantsButton,
+                              width: isMobile
+                                ? "100%"
+                                : "auto",
+                            }}
                             onClick={() =>
                               navigate(
                                 `/employer/job/${job._id}/applicants`
@@ -400,7 +532,12 @@ function EmployerDashboard() {
 
                           <button
                             type="button"
-                            style={styles.deleteButton}
+                            style={{
+                              ...styles.deleteButton,
+                              width: isMobile
+                                ? "100%"
+                                : "auto",
+                            }}
                             onClick={() =>
                               handleDelete(job._id)
                             }
@@ -418,13 +555,32 @@ function EmployerDashboard() {
 
         {/* ================= CTA ================= */}
 
-        <section style={styles.cta}>
-          <div>
+        <section
+          style={{
+            ...styles.cta,
+            flexDirection: isMobile
+              ? "column"
+              : "row",
+            alignItems: isMobile
+              ? "stretch"
+              : "center",
+            gap: isMobile ? "20px" : "30px",
+            padding: isMobile
+              ? "24px 20px"
+              : "30px 32px",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
             <span style={styles.sectionLabel}>
               BUILD YOUR TEAM
             </span>
 
-            <h2 style={styles.ctaTitle}>
+            <h2
+              style={{
+                ...styles.ctaTitle,
+                fontSize: isMobile ? "20px" : "23px",
+              }}
+            >
               Looking for talented candidates?
             </h2>
 
@@ -436,7 +592,10 @@ function EmployerDashboard() {
 
           <button
             type="button"
-            style={styles.ctaButton}
+            style={{
+              ...styles.ctaButton,
+              width: isMobile ? "100%" : "auto",
+            }}
             onClick={() =>
               navigate("/employer/create-job")
             }
@@ -451,14 +610,20 @@ function EmployerDashboard() {
 
 /* ================= STAT CARD ================= */
 
-function StatCard({ icon, label, value }) {
+function StatCard({ icon, label, value, isMobile }) {
   return (
-    <div style={styles.statCard}>
+    <div
+      style={{
+        ...styles.statCard,
+        padding: isMobile ? "14px 12px" : "18px",
+        gap: isMobile ? "9px" : "12px",
+      }}
+    >
       <div style={styles.statIcon}>
         {icon}
       </div>
 
-      <div>
+      <div style={{ minWidth: 0 }}>
         <span style={styles.statLabel}>
           {label}
         </span>
@@ -508,17 +673,15 @@ const styles = {
   container: {
     maxWidth: "1180px",
     margin: "0 auto",
-    padding: "45px 24px 0",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
+    width: "100%",
   },
 
   header: {
     display: "flex",
-    alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "30px",
-    marginBottom: "30px",
   },
 
   sectionLabel: {
@@ -533,10 +696,10 @@ const styles = {
   heading: {
     margin: "0 0 8px",
     color: "#111827",
-    fontSize: "36px",
     lineHeight: "1.15",
     letterSpacing: "-1px",
     fontWeight: "800",
+    overflowWrap: "anywhere",
   },
 
   headerDescription: {
@@ -564,38 +727,35 @@ const styles = {
     boxShadow:
       "0 7px 18px rgba(79, 70, 229, 0.18)",
     whiteSpace: "nowrap",
+    boxSizing: "border-box",
   },
 
   statsGrid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(4, minmax(0, 1fr))",
-    gap: "14px",
-    marginBottom: "35px",
   },
 
   statCard: {
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "16px",
-    padding: "18px",
     display: "flex",
     alignItems: "center",
-    gap: "12px",
     boxShadow:
       "0 8px 25px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
+    boxSizing: "border-box",
   },
 
   statIcon: {
     width: "42px",
     height: "42px",
+    flexShrink: 0,
     borderRadius: "11px",
     background: "#eef2ff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "17px",
-    flexShrink: 0,
   },
 
   statLabel: {
@@ -604,6 +764,7 @@ const styles = {
     fontSize: "10px",
     fontWeight: "600",
     marginBottom: "4px",
+    whiteSpace: "nowrap",
   },
 
   statValue: {
@@ -619,9 +780,7 @@ const styles = {
 
   sectionHeader: {
     display: "flex",
-    alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "20px",
     marginBottom: "20px",
   },
 
@@ -637,6 +796,7 @@ const styles = {
     margin: 0,
     color: "#64748b",
     fontSize: "13px",
+    lineHeight: "1.5",
   },
 
   jobCount: {
@@ -660,16 +820,16 @@ const styles = {
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "18px",
-    padding: "22px",
     boxShadow:
       "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
+    minWidth: 0,
+    overflow: "hidden",
   },
 
   jobHeader: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "20px",
   },
 
   jobIdentity: {
@@ -677,6 +837,7 @@ const styles = {
     alignItems: "center",
     gap: "13px",
     minWidth: 0,
+    width: "100%",
   },
 
   companyIcon: {
@@ -695,6 +856,7 @@ const styles = {
 
   jobIdentityText: {
     minWidth: 0,
+    flex: 1,
   },
 
   jobTitle: {
@@ -702,9 +864,7 @@ const styles = {
     color: "#1e293b",
     fontSize: "17px",
     fontWeight: "800",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
+    lineHeight: "1.3",
   },
 
   companyName: {
@@ -712,6 +872,7 @@ const styles = {
     color: "#4f46e5",
     fontSize: "12px",
     fontWeight: "700",
+    overflowWrap: "anywhere",
   },
 
   jobTypeBadge: {
@@ -727,13 +888,14 @@ const styles = {
   metaRow: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "18px",
+    gap: "10px 18px",
     marginTop: "18px",
     padding: "12px 0",
     borderTop: "1px solid #f1f5f9",
     borderBottom: "1px solid #f1f5f9",
     color: "#64748b",
     fontSize: "11px",
+    lineHeight: "1.5",
   },
 
   jobDescription: {
@@ -761,11 +923,13 @@ const styles = {
     borderRadius: "6px",
     fontSize: "10px",
     fontWeight: "600",
+    maxWidth: "100%",
+    overflowWrap: "anywhere",
+    boxSizing: "border-box",
   },
 
   jobFooter: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
     gap: "15px",
     marginTop: "18px",
@@ -784,6 +948,7 @@ const styles = {
     textDecoration: "none",
     fontSize: "11px",
     fontWeight: "700",
+    boxSizing: "border-box",
   },
 
   actionGroup: {
@@ -802,6 +967,7 @@ const styles = {
     fontSize: "11px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   applicantsButton: {
@@ -813,6 +979,7 @@ const styles = {
     fontSize: "11px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   deleteButton: {
@@ -824,6 +991,7 @@ const styles = {
     fontSize: "11px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   messageCard: {
@@ -834,6 +1002,7 @@ const styles = {
     textAlign: "center",
     boxShadow:
       "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
   },
 
   loadingSpinner: {
@@ -861,6 +1030,8 @@ const styles = {
     margin: "0 0 20px",
     color: "#64748b",
     fontSize: "13px",
+    lineHeight: "1.6",
+    overflowWrap: "anywhere",
   },
 
   emptyCard: {
@@ -871,6 +1042,7 @@ const styles = {
     textAlign: "center",
     boxShadow:
       "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
   },
 
   emptyIcon: {
@@ -902,22 +1074,20 @@ const styles = {
 
   cta: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "30px",
     background:
       "linear-gradient(135deg, #eef2ff, #f8fafc)",
     border: "1px solid #e0e7ff",
     borderRadius: "20px",
-    padding: "30px 32px",
+    boxSizing: "border-box",
   },
 
   ctaTitle: {
     margin: "0 0 7px",
     color: "#1e293b",
-    fontSize: "23px",
     fontWeight: "800",
     letterSpacing: "-0.4px",
+    lineHeight: "1.3",
   },
 
   ctaDescription: {
@@ -937,13 +1107,13 @@ const styles = {
     border: "none",
     borderRadius: "10px",
     padding: "12px 17px",
-    textDecoration: "none",
     fontSize: "12px",
     fontWeight: "800",
     whiteSpace: "nowrap",
     cursor: "pointer",
     boxShadow:
       "0 7px 18px rgba(79, 70, 229, 0.18)",
+    boxSizing: "border-box",
   },
 };
 

@@ -12,8 +12,8 @@ function JobSeekerDashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // Fetch applications
   const fetchApplications = async () => {
     try {
       setLoading(true);
@@ -54,7 +54,18 @@ function JobSeekerDashboard() {
     }
   }, [token]);
 
-  // Count applications by status
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const totalApplications = applications.length;
 
   const appliedCount = applications.filter(
@@ -73,7 +84,6 @@ function JobSeekerDashboard() {
     (application) => application.status === "Rejected"
   ).length;
 
-  // Status styling
   const getStatusStyle = (status) => {
     switch (status) {
       case "Applied":
@@ -109,20 +119,45 @@ function JobSeekerDashboard() {
   };
 
   return (
-    <main style={styles.page}>
+    <main
+      style={{
+        ...styles.page,
+        paddingBottom: isMobile ? "45px" : "80px",
+      }}
+    >
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          padding: isMobile
+            ? "28px 16px 0"
+            : "45px 24px 0",
+        }}
+      >
         {/* ================= HEADER ================= */}
 
-        <section style={styles.header}>
-          <div>
+        <section
+          style={{
+            ...styles.header,
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "stretch" : "flex-end",
+            gap: isMobile ? "20px" : "30px",
+            marginBottom: isMobile ? "25px" : "30px",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
             <span style={styles.sectionLabel}>
               JOB SEEKER DASHBOARD
             </span>
 
-            <h1 style={styles.heading}>
+            <h1
+              style={{
+                ...styles.heading,
+                fontSize: isMobile ? "28px" : "36px",
+              }}
+            >
               Welcome back, {user?.name}
             </h1>
 
@@ -132,7 +167,14 @@ function JobSeekerDashboard() {
             </p>
           </div>
 
-          <Link to="/jobs" style={styles.primaryButton}>
+          <Link
+            to="/jobs"
+            style={{
+              ...styles.primaryButton,
+              width: isMobile ? "100%" : "auto",
+              boxSizing: "border-box",
+            }}
+          >
             <span>Browse Jobs</span>
             <span>→</span>
           </Link>
@@ -140,7 +182,16 @@ function JobSeekerDashboard() {
 
         {/* ================= STATISTICS ================= */}
 
-        <section style={styles.statsGrid}>
+        <section
+          style={{
+            ...styles.statsGrid,
+            gridTemplateColumns: isMobile
+              ? "repeat(2, minmax(0, 1fr))"
+              : "repeat(5, minmax(0, 1fr))",
+            gap: isMobile ? "10px" : "14px",
+            marginBottom: isMobile ? "28px" : "35px",
+          }}
+        >
           <StatCard
             icon="📄"
             label="Total Applications"
@@ -175,8 +226,16 @@ function JobSeekerDashboard() {
         {/* ================= APPLICATIONS ================= */}
 
         <section style={styles.applicationsSection}>
-          <div style={styles.sectionHeader}>
-            <div>
+          <div
+            style={{
+              ...styles.sectionHeader,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "flex-start" : "flex-end",
+              gap: isMobile ? "12px" : "20px",
+              marginBottom: isMobile ? "16px" : "20px",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
               <span style={styles.sectionLabel}>
                 APPLICATION ACTIVITY
               </span>
@@ -199,6 +258,7 @@ function JobSeekerDashboard() {
           </div>
 
           {/* Loading */}
+
           {loading && (
             <div style={styles.messageCard}>
               <div style={styles.loadingSpinner}></div>
@@ -215,6 +275,7 @@ function JobSeekerDashboard() {
           )}
 
           {/* Error */}
+
           {!loading && error && (
             <div style={styles.messageCard}>
               <div style={styles.messageIcon}>⚠️</div>
@@ -223,9 +284,7 @@ function JobSeekerDashboard() {
                 Unable to load applications
               </h3>
 
-              <p style={styles.messageText}>
-                {error}
-              </p>
+              <p style={styles.messageText}>{error}</p>
 
               <button
                 type="button"
@@ -238,22 +297,21 @@ function JobSeekerDashboard() {
           )}
 
           {/* Empty */}
+
           {!loading &&
             !error &&
             applications.length === 0 && (
               <div style={styles.emptyCard}>
-                <div style={styles.emptyIcon}>
-                  📋
-                </div>
+                <div style={styles.emptyIcon}>📋</div>
 
                 <h3 style={styles.emptyTitle}>
                   No applications yet
                 </h3>
 
                 <p style={styles.emptyDescription}>
-                  You haven't applied for any jobs yet.
-                  Start exploring opportunities and submit
-                  your first application.
+                  You haven't applied for any jobs yet. Start
+                  exploring opportunities and submit your first
+                  application.
                 </p>
 
                 <Link
@@ -266,6 +324,7 @@ function JobSeekerDashboard() {
             )}
 
           {/* Applications */}
+
           {!loading &&
             !error &&
             applications.length > 0 && (
@@ -282,7 +341,19 @@ function JobSeekerDashboard() {
                       style={styles.applicationCard}
                     >
                       {/* Card Header */}
-                      <div style={styles.applicationHeader}>
+
+                      <div
+                        style={{
+                          ...styles.applicationHeader,
+                          flexDirection: isMobile
+                            ? "column"
+                            : "row",
+                          alignItems: isMobile
+                            ? "flex-start"
+                            : "center",
+                          gap: isMobile ? "14px" : "20px",
+                        }}
+                      >
                         <div style={styles.companySection}>
                           <div style={styles.companyIcon}>
                             {job?.company
@@ -293,7 +364,9 @@ function JobSeekerDashboard() {
                           </div>
 
                           <div style={styles.companyDetails}>
-                            <h3 style={styles.applicationTitle}>
+                            <h3
+                              style={styles.applicationTitle}
+                            >
                               {job
                                 ? job.title
                                 : "Job no longer available"}
@@ -318,24 +391,28 @@ function JobSeekerDashboard() {
                       </div>
 
                       {/* Job Meta */}
+
                       {job && (
                         <div style={styles.metaRow}>
-                          <span>
-                            📍 {job.location}
-                          </span>
+                          <span>📍 {job.location}</span>
 
-                          <span>
-                            💼 {job.jobType}
-                          </span>
+                          <span>💼 {job.jobType}</span>
 
-                          <span>
-                            💰 {job.salary}
-                          </span>
+                          <span>💰 {job.salary}</span>
                         </div>
                       )}
 
                       {/* Application Information */}
-                      <div style={styles.applicationInfo}>
+
+                      <div
+                        style={{
+                          ...styles.applicationInfo,
+                          flexDirection: isMobile
+                            ? "column"
+                            : "row",
+                          gap: isMobile ? "13px" : "45px",
+                        }}
+                      >
                         <div style={styles.infoItem}>
                           <span style={styles.infoLabel}>
                             Applied on
@@ -344,14 +421,11 @@ function JobSeekerDashboard() {
                           <strong style={styles.infoValue}>
                             {new Date(
                               application.createdAt
-                            ).toLocaleDateString(
-                              "en-IN",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )}
+                            ).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
                           </strong>
                         </div>
 
@@ -372,12 +446,27 @@ function JobSeekerDashboard() {
                       </div>
 
                       {/* Actions */}
+
                       <div style={styles.applicationFooter}>
-                        <div style={styles.applicationActions}>
+                        <div
+                          style={{
+                            ...styles.applicationActions,
+                            width: isMobile ? "100%" : "auto",
+                            flexDirection: isMobile
+                              ? "column"
+                              : "row",
+                          }}
+                        >
                           {job && (
                             <Link
                               to={`/jobs/${job._id}`}
-                              style={styles.viewJobButton}
+                              style={{
+                                ...styles.viewJobButton,
+                                width: isMobile
+                                  ? "100%"
+                                  : "auto",
+                                boxSizing: "border-box",
+                              }}
                             >
                               View Job →
                             </Link>
@@ -387,9 +476,17 @@ function JobSeekerDashboard() {
                             <button
                               type="button"
                               onClick={() =>
-                                handleViewResume(application._id)
+                                handleViewResume(
+                                  application._id
+                                )
                               }
-                              style={styles.resumeButton}
+                              style={{
+                                ...styles.resumeButton,
+                                width: isMobile
+                                  ? "100%"
+                                  : "auto",
+                                boxSizing: "border-box",
+                              }}
                             >
                               📄 View Resume
                             </button>
@@ -405,13 +502,30 @@ function JobSeekerDashboard() {
 
         {/* ================= CTA ================= */}
 
-        <section style={styles.cta}>
+        <section
+          style={{
+            ...styles.cta,
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile
+              ? "stretch"
+              : "center",
+            gap: isMobile ? "20px" : "30px",
+            padding: isMobile
+              ? "24px 20px"
+              : "30px 32px",
+          }}
+        >
           <div>
             <span style={styles.sectionLabel}>
               KEEP GOING
             </span>
 
-            <h2 style={styles.ctaTitle}>
+            <h2
+              style={{
+                ...styles.ctaTitle,
+                fontSize: isMobile ? "20px" : "23px",
+              }}
+            >
               Looking for your next opportunity?
             </h2>
 
@@ -423,7 +537,11 @@ function JobSeekerDashboard() {
 
           <Link
             to="/jobs"
-            style={styles.ctaButton}
+            style={{
+              ...styles.ctaButton,
+              width: isMobile ? "100%" : "auto",
+              boxSizing: "border-box",
+            }}
           >
             Find More Jobs →
           </Link>
@@ -438,18 +556,12 @@ function JobSeekerDashboard() {
 function StatCard({ icon, label, value }) {
   return (
     <div style={styles.statCard}>
-      <div style={styles.statIcon}>
-        {icon}
-      </div>
+      <div style={styles.statIcon}>{icon}</div>
 
-      <div>
-        <span style={styles.statLabel}>
-          {label}
-        </span>
+      <div style={{ minWidth: 0 }}>
+        <span style={styles.statLabel}>{label}</span>
 
-        <strong style={styles.statValue}>
-          {value}
-        </strong>
+        <strong style={styles.statValue}>{value}</strong>
       </div>
     </div>
   );
@@ -464,7 +576,7 @@ const styles = {
       "linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%)",
     position: "relative",
     overflow: "hidden",
-    paddingBottom: "80px",
+    boxSizing: "border-box",
   },
 
   backgroundShapeOne: {
@@ -492,17 +604,15 @@ const styles = {
   container: {
     maxWidth: "1180px",
     margin: "0 auto",
-    padding: "45px 24px 0",
+    width: "100%",
+    boxSizing: "border-box",
     position: "relative",
     zIndex: 1,
   },
 
   header: {
     display: "flex",
-    alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "30px",
-    marginBottom: "30px",
   },
 
   sectionLabel: {
@@ -517,10 +627,10 @@ const styles = {
   heading: {
     margin: "0 0 8px",
     color: "#111827",
-    fontSize: "36px",
     lineHeight: "1.15",
     letterSpacing: "-1px",
     fontWeight: "800",
+    overflowWrap: "anywhere",
   },
 
   headerDescription: {
@@ -550,22 +660,19 @@ const styles = {
 
   statsGrid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(5, minmax(0, 1fr))",
-    gap: "14px",
-    marginBottom: "35px",
   },
 
   statCard: {
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "16px",
-    padding: "18px",
+    padding: "16px",
     display: "flex",
     alignItems: "center",
-    gap: "12px",
-    boxShadow:
-      "0 8px 25px rgba(15, 23, 42, 0.04)",
+    gap: "10px",
+    boxShadow: "0 8px 25px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
+    boxSizing: "border-box",
   },
 
   statIcon: {
@@ -586,6 +693,7 @@ const styles = {
     fontSize: "10px",
     fontWeight: "600",
     marginBottom: "4px",
+    lineHeight: "1.3",
   },
 
   statValue: {
@@ -601,10 +709,7 @@ const styles = {
 
   sectionHeader: {
     display: "flex",
-    alignItems: "flex-end",
     justifyContent: "space-between",
-    gap: "20px",
-    marginBottom: "20px",
   },
 
   sectionTitle: {
@@ -619,6 +724,7 @@ const styles = {
     margin: 0,
     color: "#64748b",
     fontSize: "13px",
+    lineHeight: "1.5",
   },
 
   applicationCount: {
@@ -643,15 +749,14 @@ const styles = {
     border: "1px solid #e2e8f0",
     borderRadius: "18px",
     padding: "22px",
-    boxShadow:
-      "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxShadow: "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
+    minWidth: 0,
   },
 
   applicationHeader: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "20px",
   },
 
   companySection: {
@@ -659,6 +764,7 @@ const styles = {
     alignItems: "center",
     gap: "13px",
     minWidth: 0,
+    width: "100%",
   },
 
   companyIcon: {
@@ -677,6 +783,7 @@ const styles = {
 
   companyDetails: {
     minWidth: 0,
+    flex: 1,
   },
 
   applicationTitle: {
@@ -707,18 +814,18 @@ const styles = {
   metaRow: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "18px",
+    gap: "12px 18px",
     marginTop: "18px",
     padding: "12px 0",
     borderTop: "1px solid #f1f5f9",
     borderBottom: "1px solid #f1f5f9",
     color: "#64748b",
     fontSize: "11px",
+    overflowWrap: "anywhere",
   },
 
   applicationInfo: {
     display: "flex",
-    gap: "45px",
     marginTop: "17px",
   },
 
@@ -789,8 +896,8 @@ const styles = {
     borderRadius: "18px",
     padding: "45px 25px",
     textAlign: "center",
-    boxShadow:
-      "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxShadow: "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
   },
 
   loadingSpinner: {
@@ -818,6 +925,7 @@ const styles = {
     margin: "0 0 20px",
     color: "#64748b",
     fontSize: "13px",
+    lineHeight: "1.6",
   },
 
   emptyCard: {
@@ -826,8 +934,8 @@ const styles = {
     borderRadius: "18px",
     padding: "55px 25px",
     textAlign: "center",
-    boxShadow:
-      "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxShadow: "0 8px 25px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
   },
 
   emptyIcon: {
@@ -859,22 +967,19 @@ const styles = {
 
   cta: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "30px",
-    background:
-      "linear-gradient(135deg, #eef2ff, #f8fafc)",
+    background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
     border: "1px solid #e0e7ff",
     borderRadius: "20px",
-    padding: "30px 32px",
+    boxSizing: "border-box",
   },
 
   ctaTitle: {
     margin: "0 0 7px",
     color: "#1e293b",
-    fontSize: "23px",
     fontWeight: "800",
     letterSpacing: "-0.4px",
+    lineHeight: "1.3",
   },
 
   ctaDescription: {

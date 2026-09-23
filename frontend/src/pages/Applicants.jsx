@@ -19,6 +19,21 @@ function Applicants() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const fetchApplicants = async () => {
     try {
@@ -95,7 +110,6 @@ function Applicants() {
       }
 
       const blob = await response.blob();
-
       const resumeUrl = URL.createObjectURL(blob);
 
       newTab.location.href = resumeUrl;
@@ -127,7 +141,6 @@ function Applicants() {
       }
 
       const blob = await response.blob();
-
       const resumeUrl = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
@@ -188,7 +201,15 @@ function Applicants() {
   if (loading) {
     return (
       <main style={styles.page}>
-        <div style={styles.loadingContainer}>
+        <div
+          style={{
+            ...styles.loadingContainer,
+            margin: isMobile ? "60px 16px" : "100px auto",
+            padding: isMobile
+              ? "35px 20px"
+              : "45px 30px",
+          }}
+        >
           <div style={styles.loadingSpinner}></div>
 
           <h2 style={styles.loadingTitle}>
@@ -208,10 +229,29 @@ function Applicants() {
       <div style={styles.backgroundShapeOne}></div>
       <div style={styles.backgroundShapeTwo}></div>
 
-      <div style={styles.container}>
+      <div
+        style={{
+          ...styles.container,
+          padding: isMobile
+            ? "25px 16px 0"
+            : "35px 24px 0",
+        }}
+      >
         {/* ================= HEADER ================= */}
+
         <section style={styles.header}>
-          <div style={styles.headerTop}>
+          <div
+            style={{
+              ...styles.headerTop,
+              flexDirection: isMobile
+                ? "column"
+                : "row",
+              alignItems: isMobile
+                ? "flex-start"
+                : "center",
+              gap: isMobile ? "12px" : "15px",
+            }}
+          >
             <Link
               to="/employer/dashboard"
               style={styles.backLink}
@@ -227,13 +267,29 @@ function Applicants() {
             </div>
           </div>
 
-          <div style={styles.headerMain}>
-            <div>
+          <div
+            style={{
+              ...styles.headerMain,
+              flexDirection: isMobile
+                ? "column"
+                : "row",
+              alignItems: isMobile
+                ? "flex-start"
+                : "center",
+              gap: isMobile ? "15px" : "25px",
+            }}
+          >
+            <div style={{ minWidth: 0, width: "100%" }}>
               <span style={styles.eyebrow}>
                 APPLICANTS
               </span>
 
-              <h1 style={styles.pageTitle}>
+              <h1
+                style={{
+                  ...styles.pageTitle,
+                  fontSize: isMobile ? "26px" : "32px",
+                }}
+              >
                 {job?.title || "Job Applicants"}
               </h1>
 
@@ -264,15 +320,31 @@ function Applicants() {
               </p>
             </div>
 
-            <div style={styles.headerIcon}>
+            <div
+              style={{
+                ...styles.headerIcon,
+                display: isMobile ? "none" : "flex",
+              }}
+            >
               👥
             </div>
           </div>
         </section>
 
         {/* ================= ERROR ================= */}
+
         {error && (
-          <div style={styles.errorBox}>
+          <div
+            style={{
+              ...styles.errorBox,
+              flexDirection: isMobile
+                ? "column"
+                : "row",
+              alignItems: isMobile
+                ? "stretch"
+                : "center",
+            }}
+          >
             <div style={styles.errorIcon}>⚠</div>
 
             <div style={styles.errorContent}>
@@ -288,7 +360,10 @@ function Applicants() {
             <button
               type="button"
               onClick={fetchApplicants}
-              style={styles.retryButton}
+              style={{
+                ...styles.retryButton,
+                width: isMobile ? "100%" : "auto",
+              }}
             >
               Try Again
             </button>
@@ -296,99 +371,57 @@ function Applicants() {
         )}
 
         {/* ================= SUMMARY ================= */}
+
         {!error && applications.length > 0 && (
-          <div style={styles.summaryGrid}>
-            <div style={styles.summaryCard}>
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#eef2ff",
-                  color: "#4f46e5",
-                }}
-              >
-                👥
-              </div>
+          <div
+            style={{
+              ...styles.summaryGrid,
+              gridTemplateColumns: isMobile
+                ? "repeat(2, minmax(0, 1fr))"
+                : "repeat(4, minmax(0, 1fr))",
+              gap: isMobile ? "9px" : "13px",
+            }}
+          >
+            <SummaryCard
+              icon="👥"
+              label="Total"
+              value={applications.length}
+              background="#eef2ff"
+              color="#4f46e5"
+              isMobile={isMobile}
+            />
 
-              <div>
-                <span style={styles.summaryLabel}>
-                  Total
-                </span>
+            <SummaryCard
+              icon="📄"
+              label="Applied"
+              value={getStatusCount("Applied")}
+              background="#eff6ff"
+              color="#2563eb"
+              isMobile={isMobile}
+            />
 
-                <strong style={styles.summaryValue}>
-                  {applications.length}
-                </strong>
-              </div>
-            </div>
+            <SummaryCard
+              icon="⭐"
+              label="Shortlisted"
+              value={getStatusCount("Shortlisted")}
+              background="#fff7ed"
+              color="#ea580c"
+              isMobile={isMobile}
+            />
 
-            <div style={styles.summaryCard}>
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#eff6ff",
-                  color: "#2563eb",
-                }}
-              >
-                📄
-              </div>
-
-              <div>
-                <span style={styles.summaryLabel}>
-                  Applied
-                </span>
-
-                <strong style={styles.summaryValue}>
-                  {getStatusCount("Applied")}
-                </strong>
-              </div>
-            </div>
-
-            <div style={styles.summaryCard}>
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#fff7ed",
-                  color: "#ea580c",
-                }}
-              >
-                ⭐
-              </div>
-
-              <div>
-                <span style={styles.summaryLabel}>
-                  Shortlisted
-                </span>
-
-                <strong style={styles.summaryValue}>
-                  {getStatusCount("Shortlisted")}
-                </strong>
-              </div>
-            </div>
-
-            <div style={styles.summaryCard}>
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#f0fdf4",
-                  color: "#16a34a",
-                }}
-              >
-                ✓
-              </div>
-
-              <div>
-                <span style={styles.summaryLabel}>
-                  Hired
-                </span>
-
-                <strong style={styles.summaryValue}>
-                  {getStatusCount("Hired")}
-                </strong>
-              </div>
-            </div>
+            <SummaryCard
+              icon="✓"
+              label="Hired"
+              value={getStatusCount("Hired")}
+              background="#f0fdf4"
+              color="#16a34a"
+              isMobile={isMobile}
+            />
           </div>
         )}
 
         {/* ================= EMPTY STATE ================= */}
+
         {!error && applications.length === 0 ? (
           <div style={styles.emptyCard}>
             <div style={styles.emptyIcon}>
@@ -413,8 +446,26 @@ function Applicants() {
           </div>
         ) : (
           !error && (
-            <section style={styles.applicantsSection}>
-              <div style={styles.sectionHeader}>
+            <section
+              style={{
+                ...styles.applicantsSection,
+                padding: isMobile ? "17px" : "25px",
+                borderRadius: isMobile ? "16px" : "20px",
+              }}
+            >
+              {/* Section Header */}
+
+              <div
+                style={{
+                  ...styles.sectionHeader,
+                  alignItems: isMobile
+                    ? "flex-start"
+                    : "center",
+                  flexDirection: isMobile
+                    ? "column"
+                    : "row",
+                }}
+              >
                 <div>
                   <span style={styles.sectionEyebrow}>
                     CANDIDATES
@@ -430,6 +481,8 @@ function Applicants() {
                 </span>
               </div>
 
+              {/* Applicants */}
+
               <div style={styles.applicantsList}>
                 {applications.map((application) => {
                   const applicantName =
@@ -443,17 +496,37 @@ function Applicants() {
                   return (
                     <article
                       key={application._id}
-                      style={styles.applicantCard}
+                      style={{
+                        ...styles.applicantCard,
+                        flexDirection: isMobile
+                          ? "column"
+                          : "row",
+                        alignItems: isMobile
+                          ? "stretch"
+                          : "center",
+                        gap: isMobile ? "16px" : "20px",
+                        padding: isMobile
+                          ? "15px"
+                          : "17px",
+                      }}
                     >
                       {/* CANDIDATE */}
+
                       <div style={styles.candidateInfo}>
                         <div style={styles.avatar}>
                           {getInitials(applicantName)}
                         </div>
 
-                        <div style={styles.candidateDetails}>
+                        <div
+                          style={styles.candidateDetails}
+                        >
                           <div style={styles.nameRow}>
-                            <h3 style={styles.candidateName}>
+                            <h3
+                              style={{
+                                ...styles.candidateName,
+                                overflowWrap: "anywhere",
+                              }}
+                            >
                               {applicantName}
                             </h3>
 
@@ -469,7 +542,17 @@ function Applicants() {
                             </span>
                           </div>
 
-                          <p style={styles.email}>
+                          <p
+                            style={{
+                              ...styles.email,
+                              whiteSpace: isMobile
+                                ? "normal"
+                                : "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              overflowWrap: "anywhere",
+                            }}
+                          >
                             ✉ {applicantEmail}
                           </p>
 
@@ -490,9 +573,36 @@ function Applicants() {
                       </div>
 
                       {/* ACTIONS */}
-                      <div style={styles.candidateActions}>
+
+                      <div
+                        style={{
+                          ...styles.candidateActions,
+                          width: isMobile
+                            ? "100%"
+                            : "auto",
+                          alignItems: isMobile
+                            ? "stretch"
+                            : "flex-end",
+                          flexDirection: isMobile
+                            ? "column"
+                            : "row",
+                          gap: isMobile
+                            ? "12px"
+                            : "15px",
+                        }}
+                      >
                         {application.resume && (
-                          <div style={styles.resumeActions}>
+                          <div
+                            style={{
+                              ...styles.resumeActions,
+                              width: isMobile
+                                ? "100%"
+                                : "auto",
+                              flexDirection: isMobile
+                                ? "column"
+                                : "row",
+                            }}
+                          >
                             <button
                               type="button"
                               onClick={() =>
@@ -500,7 +610,12 @@ function Applicants() {
                                   application._id
                                 )
                               }
-                              style={styles.viewResumeButton}
+                              style={{
+                                ...styles.viewResumeButton,
+                                width: isMobile
+                                  ? "100%"
+                                  : "auto",
+                              }}
                             >
                               👁 View Resume
                             </button>
@@ -512,14 +627,29 @@ function Applicants() {
                                   application._id
                                 )
                               }
-                              style={styles.downloadButton}
+                              style={{
+                                ...styles.downloadButton,
+                                width: isMobile
+                                  ? "100%"
+                                  : "auto",
+                              }}
                             >
                               ↓ Download
                             </button>
                           </div>
                         )}
 
-                        <div style={styles.statusControl}>
+                        <div
+                          style={{
+                            ...styles.statusControl,
+                            width: isMobile
+                              ? "100%"
+                              : "auto",
+                            minWidth: isMobile
+                              ? "0"
+                              : "145px",
+                          }}
+                        >
                           <label
                             htmlFor={`status-${application._id}`}
                             style={styles.statusLabel}
@@ -541,6 +671,8 @@ function Applicants() {
                               ...getStatusStyle(
                                 application.status
                               ),
+                              width: "100%",
+                              boxSizing: "border-box",
                             }}
                           >
                             <option value="Applied">
@@ -570,13 +702,21 @@ function Applicants() {
         )}
 
         {/* ================= FOOTER TIP ================= */}
+
         {!error && applications.length > 0 && (
-          <div style={styles.tipCard}>
+          <div
+            style={{
+              ...styles.tipCard,
+              alignItems: isMobile
+                ? "flex-start"
+                : "center",
+            }}
+          >
             <div style={styles.tipIcon}>
               💡
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <strong style={styles.tipTitle}>
                 Managing applications
               </strong>
@@ -593,6 +733,49 @@ function Applicants() {
     </main>
   );
 }
+
+/* ================= SUMMARY CARD ================= */
+
+function SummaryCard({
+  icon,
+  label,
+  value,
+  background,
+  color,
+  isMobile,
+}) {
+  return (
+    <div
+      style={{
+        ...styles.summaryCard,
+        padding: isMobile ? "12px 10px" : "15px",
+        gap: isMobile ? "8px" : "11px",
+      }}
+    >
+      <div
+        style={{
+          ...styles.summaryIcon,
+          background,
+          color,
+        }}
+      >
+        {icon}
+      </div>
+
+      <div style={{ minWidth: 0 }}>
+        <span style={styles.summaryLabel}>
+          {label}
+        </span>
+
+        <strong style={styles.summaryValue}>
+          {value}
+        </strong>
+      </div>
+    </div>
+  );
+}
+
+/* ================= STYLES ================= */
 
 const styles = {
   page: {
@@ -629,9 +812,10 @@ const styles = {
   container: {
     maxWidth: "1100px",
     margin: "0 auto",
-    padding: "35px 24px 0",
     position: "relative",
     zIndex: 1,
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   header: {
@@ -640,9 +824,7 @@ const styles = {
 
   headerTop: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "15px",
     marginBottom: "22px",
   },
 
@@ -669,9 +851,7 @@ const styles = {
 
   headerMain: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "25px",
   },
 
   eyebrow: {
@@ -686,10 +866,10 @@ const styles = {
   pageTitle: {
     margin: 0,
     color: "#111827",
-    fontSize: "32px",
     lineHeight: "1.2",
     letterSpacing: "-0.7px",
     fontWeight: "800",
+    overflowWrap: "anywhere",
   },
 
   jobMeta: {
@@ -701,6 +881,7 @@ const styles = {
     color: "#64748b",
     fontSize: "11px",
     fontWeight: "600",
+    lineHeight: "1.5",
   },
 
   metaDot: {
@@ -721,7 +902,6 @@ const styles = {
     borderRadius: "18px",
     background:
       "linear-gradient(135deg, #eef2ff, #e0e7ff)",
-    display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "25px",
@@ -732,22 +912,19 @@ const styles = {
 
   summaryGrid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(4, minmax(0, 1fr))",
-    gap: "13px",
     marginBottom: "22px",
   },
 
   summaryCard: {
     display: "flex",
     alignItems: "center",
-    gap: "11px",
-    padding: "15px",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "14px",
     boxShadow:
       "0 7px 22px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
+    boxSizing: "border-box",
   },
 
   summaryIcon: {
@@ -781,15 +958,15 @@ const styles = {
   applicantsSection: {
     background: "#ffffff",
     border: "1px solid #e2e8f0",
-    borderRadius: "20px",
-    padding: "25px",
     boxShadow:
       "0 15px 40px rgba(15, 23, 42, 0.06)",
+    boxSizing: "border-box",
+    width: "100%",
+    overflow: "hidden",
   },
 
   sectionHeader: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
     gap: "15px",
     marginBottom: "18px",
@@ -820,6 +997,7 @@ const styles = {
     color: "#64748b",
     fontSize: "10px",
     fontWeight: "700",
+    whiteSpace: "nowrap",
   },
 
   applicantsList: {
@@ -830,14 +1008,13 @@ const styles = {
 
   applicantCard: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-    gap: "20px",
-    padding: "17px",
     border: "1px solid #e2e8f0",
     borderRadius: "14px",
     background: "#ffffff",
-    transition: "box-shadow 0.2s ease",
+    boxSizing: "border-box",
+    minWidth: 0,
+    overflow: "hidden",
   },
 
   candidateInfo: {
@@ -867,6 +1044,7 @@ const styles = {
 
   candidateDetails: {
     minWidth: 0,
+    flex: 1,
   },
 
   nameRow: {
@@ -890,6 +1068,7 @@ const styles = {
     borderRadius: "20px",
     fontSize: "9px",
     fontWeight: "800",
+    whiteSpace: "nowrap",
   },
 
   statusApplied: {
@@ -916,9 +1095,7 @@ const styles = {
     margin: "5px 0 2px",
     color: "#64748b",
     fontSize: "10px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
+    lineHeight: "1.5",
   },
 
   appliedDate: {
@@ -929,14 +1106,11 @@ const styles = {
 
   candidateActions: {
     display: "flex",
-    alignItems: "flex-end",
-    gap: "15px",
     flexShrink: 0,
   },
 
   resumeActions: {
     display: "flex",
-    alignItems: "center",
     gap: "7px",
   },
 
@@ -949,6 +1123,7 @@ const styles = {
     fontSize: "10px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   downloadButton: {
@@ -960,13 +1135,13 @@ const styles = {
     fontSize: "10px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   statusControl: {
     display: "flex",
     flexDirection: "column",
     gap: "5px",
-    minWidth: "145px",
   },
 
   statusLabel: {
@@ -989,13 +1164,13 @@ const styles = {
 
   errorBox: {
     display: "flex",
-    alignItems: "center",
     gap: "11px",
     marginBottom: "20px",
     padding: "13px",
     borderRadius: "11px",
     background: "#fef2f2",
     border: "1px solid #fecaca",
+    boxSizing: "border-box",
   },
 
   errorIcon: {
@@ -1014,6 +1189,7 @@ const styles = {
 
   errorContent: {
     flex: 1,
+    minWidth: 0,
   },
 
   errorTitle: {
@@ -1027,6 +1203,7 @@ const styles = {
     margin: 0,
     color: "#b91c1c",
     fontSize: "10px",
+    overflowWrap: "anywhere",
   },
 
   retryButton: {
@@ -1038,6 +1215,7 @@ const styles = {
     fontSize: "10px",
     fontWeight: "700",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   emptyCard: {
@@ -1048,6 +1226,7 @@ const styles = {
     boxShadow:
       "0 15px 40px rgba(15, 23, 42, 0.05)",
     textAlign: "center",
+    boxSizing: "border-box",
   },
 
   emptyIcon: {
@@ -1095,17 +1274,18 @@ const styles = {
 
   tipCard: {
     display: "flex",
-    alignItems: "flex-start",
     gap: "12px",
     marginTop: "18px",
     padding: "15px 17px",
     borderRadius: "14px",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
+    boxSizing: "border-box",
   },
 
   tipIcon: {
     fontSize: "17px",
+    flexShrink: 0,
   },
 
   tipTitle: {
@@ -1125,13 +1305,13 @@ const styles = {
   loadingContainer: {
     maxWidth: "600px",
     margin: "100px auto",
-    padding: "45px 30px",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
     borderRadius: "20px",
     boxShadow:
       "0 15px 45px rgba(15, 23, 42, 0.07)",
     textAlign: "center",
+    boxSizing: "border-box",
   },
 
   loadingSpinner: {

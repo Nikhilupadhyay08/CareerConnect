@@ -13,9 +13,7 @@ function Jobs() {
   };
 
   const [jobs, setJobs] = useState([]);
-
   const [filters, setFilters] = useState(defaultFilters);
-
   const [currentPage, setCurrentPage] = useState(1);
 
   const [pagination, setPagination] = useState({
@@ -28,6 +26,24 @@ function Jobs() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 768
+  );
+
+  // ==================== RESPONSIVE ====================
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // ==================== FETCH JOBS ====================
 
@@ -50,17 +66,13 @@ function Jobs() {
       setPagination({
         totalJobs: data.totalJobs || 0,
         totalPages: data.totalPages || 1,
-        jobsPerPage:
-          data.jobsPerPage || JOBS_PER_PAGE,
+        jobsPerPage: data.jobsPerPage || JOBS_PER_PAGE,
         hasNextPage: Boolean(data.hasNextPage),
-        hasPreviousPage: Boolean(
-          data.hasPreviousPage
-        ),
+        hasPreviousPage: Boolean(data.hasPreviousPage),
       });
     } catch (err) {
       setError(
-        err.message ||
-          "Failed to load jobs. Please try again."
+        err.message || "Failed to load jobs. Please try again."
       );
     } finally {
       setLoading(false);
@@ -121,10 +133,7 @@ function Jobs() {
   const getCompanyInitial = (company) => {
     if (!company) return "C";
 
-    return company
-      .trim()
-      .charAt(0)
-      .toUpperCase();
+    return company.trim().charAt(0).toUpperCase();
   };
 
   const getJobTypeStyle = (jobType) => {
@@ -161,6 +170,203 @@ function Jobs() {
     }
   };
 
+  // ==================== RESPONSIVE STYLES ====================
+
+  const responsiveStyles = {
+    hero: {
+      ...styles.hero,
+      padding: isMobile
+        ? "48px 20px 30px"
+        : styles.hero.padding,
+    },
+
+    heading: {
+      ...styles.heading,
+      fontSize: isMobile ? "38px" : styles.heading.fontSize,
+      lineHeight: isMobile ? "1.08" : styles.heading.lineHeight,
+      letterSpacing: isMobile
+        ? "-1.5px"
+        : styles.heading.letterSpacing,
+    },
+
+    heroDescription: {
+      ...styles.heroDescription,
+      fontSize: isMobile ? "14px" : styles.heroDescription.fontSize,
+      lineHeight: isMobile ? "1.65" : styles.heroDescription.lineHeight,
+      marginTop: isMobile ? "16px" : styles.heroDescription.margin,
+    },
+
+    heroStats: {
+      ...styles.heroStats,
+      flexDirection: isMobile ? "column" : "row",
+      alignItems: isMobile ? "stretch" : "center",
+      gap: isMobile ? "12px" : styles.heroStats.gap,
+      marginTop: isMobile ? "24px" : styles.heroStats.marginTop,
+    },
+
+    heroStat: {
+      ...styles.heroStat,
+      width: isMobile ? "100%" : "auto",
+    },
+
+    heroStatDivider: {
+      ...styles.heroStatDivider,
+      display: isMobile ? "none" : "block",
+    },
+
+    searchSection: {
+      ...styles.searchSection,
+      padding: isMobile ? "0 16px" : styles.searchSection.padding,
+    },
+
+    searchCard: {
+      ...styles.searchCard,
+      padding: isMobile ? "20px 16px" : styles.searchCard.padding,
+      borderRadius: isMobile ? "16px" : styles.searchCard.borderRadius,
+      width: "100%",
+      boxSizing: "border-box",
+    },
+
+    searchHeader: {
+      ...styles.searchHeader,
+      marginBottom: isMobile ? "20px" : styles.searchHeader.marginBottom,
+    },
+
+    searchTitle: {
+      ...styles.searchTitle,
+      fontSize: isMobile ? "18px" : styles.searchTitle.fontSize,
+    },
+
+    searchSubtitle: {
+      ...styles.searchSubtitle,
+      fontSize: isMobile ? "11px" : styles.searchSubtitle.fontSize,
+      maxWidth: isMobile ? "230px" : "none",
+      lineHeight: isMobile ? "1.5" : "normal",
+    },
+
+    searchGrid: {
+      ...styles.searchGrid,
+      gridTemplateColumns: isMobile
+        ? "minmax(0, 1fr)"
+        : styles.searchGrid.gridTemplateColumns,
+      gap: isMobile ? "13px" : styles.searchGrid.gap,
+    },
+
+    inputWrapper: {
+      ...styles.inputWrapper,
+      width: "100%",
+      boxSizing: "border-box",
+    },
+
+    input: {
+      ...styles.input,
+      boxSizing: "border-box",
+    },
+
+    select: {
+      ...styles.select,
+      boxSizing: "border-box",
+    },
+
+    searchActions: {
+      ...styles.searchActions,
+      flexDirection: isMobile ? "column" : "row",
+      alignItems: isMobile ? "stretch" : "center",
+      gap: isMobile ? "10px" : styles.searchActions.gap,
+    },
+
+    searchButton: {
+      ...styles.searchButton,
+      width: isMobile ? "100%" : "auto",
+      justifyContent: "center",
+    },
+
+    clearButton: {
+      ...styles.clearButton,
+      width: isMobile ? "100%" : "auto",
+    },
+
+    resultsSection: {
+      ...styles.resultsSection,
+      padding: isMobile
+        ? "42px 16px 0"
+        : styles.resultsSection.padding,
+    },
+
+    resultsHeader: {
+      ...styles.resultsHeader,
+      alignItems: isMobile ? "flex-start" : "flex-end",
+      flexDirection: isMobile ? "column" : "row",
+      gap: isMobile ? "14px" : "0",
+      marginBottom: isMobile ? "20px" : styles.resultsHeader.marginBottom,
+    },
+
+    resultsTitle: {
+      ...styles.resultsTitle,
+      fontSize: isMobile ? "25px" : styles.resultsTitle.fontSize,
+    },
+
+    resultBadge: {
+      ...styles.resultBadge,
+      alignSelf: isMobile ? "flex-start" : "auto",
+    },
+
+    jobGrid: {
+      ...styles.jobGrid,
+      gridTemplateColumns: isMobile
+        ? "minmax(0, 1fr)"
+        : styles.jobGrid.gridTemplateColumns,
+      gap: isMobile ? "15px" : styles.jobGrid.gap,
+    },
+
+    jobCard: {
+      ...styles.jobCard,
+      padding: isMobile ? "18px" : styles.jobCard.padding,
+      minHeight: isMobile ? "auto" : styles.jobCard.minHeight,
+      borderRadius: isMobile ? "16px" : styles.jobCard.borderRadius,
+    },
+
+    jobTitle: {
+      ...styles.jobTitle,
+      fontSize: isMobile ? "17px" : styles.jobTitle.fontSize,
+    },
+
+    cardFooter: {
+      ...styles.cardFooter,
+      flexDirection: isMobile ? "column" : "row",
+      alignItems: isMobile ? "flex-start" : "center",
+    },
+
+    viewButton: {
+      ...styles.viewButton,
+      alignSelf: isMobile ? "flex-end" : "auto",
+    },
+
+    pagination: {
+      ...styles.pagination,
+      flexWrap: "wrap",
+      gap: isMobile ? "12px" : styles.pagination.gap,
+      marginTop: isMobile ? "30px" : styles.pagination.marginTop,
+    },
+
+    paginationButton: {
+      ...styles.paginationButton,
+      padding: isMobile ? "0 12px" : styles.paginationButton.padding,
+    },
+
+    messageBox: {
+      ...styles.messageBox,
+      padding: isMobile
+        ? "45px 18px"
+        : styles.messageBox.padding,
+    },
+
+    messageText: {
+      ...styles.messageText,
+      fontSize: isMobile ? "12px" : styles.messageText.fontSize,
+    },
+  };
+
   return (
     <main style={styles.page}>
       {/* Background Decorations */}
@@ -169,13 +375,13 @@ function Jobs() {
 
       {/* ==================== HERO ==================== */}
 
-      <section style={styles.hero}>
+      <section style={responsiveStyles.hero}>
         <div style={styles.heroContent}>
           <div style={styles.eyebrow}>
             CAREERCONNECT JOBS
           </div>
 
-          <h1 style={styles.heading}>
+          <h1 style={responsiveStyles.heading}>
             Find the right
             <br />
             <span style={styles.headingHighlight}>
@@ -183,14 +389,14 @@ function Jobs() {
             </span>
           </h1>
 
-          <p style={styles.heroDescription}>
+          <p style={responsiveStyles.heroDescription}>
             Discover jobs from companies looking for
             talented people like you. Search, filter and
             find your next career opportunity.
           </p>
 
-          <div style={styles.heroStats}>
-            <div style={styles.heroStat}>
+          <div style={responsiveStyles.heroStats}>
+            <div style={responsiveStyles.heroStat}>
               <span style={styles.heroStatIcon}>
                 💼
               </span>
@@ -201,9 +407,9 @@ function Jobs() {
               </div>
             </div>
 
-            <div style={styles.heroStatDivider}></div>
+            <div style={responsiveStyles.heroStatDivider}></div>
 
-            <div style={styles.heroStat}>
+            <div style={responsiveStyles.heroStat}>
               <span style={styles.heroStatIcon}>
                 🔎
               </span>
@@ -214,9 +420,9 @@ function Jobs() {
               </div>
             </div>
 
-            <div style={styles.heroStatDivider}></div>
+            <div style={responsiveStyles.heroStatDivider}></div>
 
-            <div style={styles.heroStat}>
+            <div style={responsiveStyles.heroStat}>
               <span style={styles.heroStatIcon}>
                 🚀
               </span>
@@ -232,18 +438,18 @@ function Jobs() {
 
       {/* ==================== SEARCH ==================== */}
 
-      <section style={styles.searchSection}>
+      <section style={responsiveStyles.searchSection}>
         <form
           onSubmit={handleSearch}
-          style={styles.searchCard}
+          style={responsiveStyles.searchCard}
         >
-          <div style={styles.searchHeader}>
+          <div style={responsiveStyles.searchHeader}>
             <div>
-              <h2 style={styles.searchTitle}>
+              <h2 style={responsiveStyles.searchTitle}>
                 Search Jobs
               </h2>
 
-              <p style={styles.searchSubtitle}>
+              <p style={responsiveStyles.searchSubtitle}>
                 Find opportunities matching your
                 preferences.
               </p>
@@ -254,7 +460,7 @@ function Jobs() {
             </span>
           </div>
 
-          <div style={styles.searchGrid}>
+          <div style={responsiveStyles.searchGrid}>
             {/* Job Search */}
             <div style={styles.searchField}>
               <label
@@ -372,10 +578,10 @@ function Jobs() {
             </div>
           </div>
 
-          <div style={styles.searchActions}>
+          <div style={responsiveStyles.searchActions}>
             <button
               type="submit"
-              style={styles.searchButton}
+              style={responsiveStyles.searchButton}
             >
               <span>🔎</span>
               Search Jobs
@@ -384,7 +590,7 @@ function Jobs() {
             <button
               type="button"
               onClick={handleClear}
-              style={styles.clearButton}
+              style={responsiveStyles.clearButton}
             >
               Clear Filters
             </button>
@@ -394,14 +600,14 @@ function Jobs() {
 
       {/* ==================== RESULTS ==================== */}
 
-      <section style={styles.resultsSection}>
-        <div style={styles.resultsHeader}>
+      <section style={responsiveStyles.resultsSection}>
+        <div style={responsiveStyles.resultsHeader}>
           <div>
             <div style={styles.resultsEyebrow}>
               OPPORTUNITIES
             </div>
 
-            <h2 style={styles.resultsTitle}>
+            <h2 style={responsiveStyles.resultsTitle}>
               Available Jobs
             </h2>
 
@@ -421,7 +627,7 @@ function Jobs() {
           {!loading &&
             !error &&
             jobs.length > 0 && (
-              <div style={styles.resultBadge}>
+              <div style={responsiveStyles.resultBadge}>
                 {pagination.totalJobs} Jobs
               </div>
             )}
@@ -430,14 +636,14 @@ function Jobs() {
         {/* ==================== LOADING ==================== */}
 
         {loading ? (
-          <div style={styles.messageBox}>
+          <div style={responsiveStyles.messageBox}>
             <div style={styles.spinner}></div>
 
             <h3 style={styles.messageTitle}>
               Loading jobs...
             </h3>
 
-            <p style={styles.messageText}>
+            <p style={responsiveStyles.messageText}>
               Finding the latest opportunities for
               you.
             </p>
@@ -445,7 +651,7 @@ function Jobs() {
         ) : error ? (
           /* ==================== ERROR ==================== */
 
-          <div style={styles.messageBox}>
+          <div style={responsiveStyles.messageBox}>
             <div style={styles.messageIcon}>
               ⚠️
             </div>
@@ -454,7 +660,7 @@ function Jobs() {
               Something went wrong
             </h3>
 
-            <p style={styles.messageText}>
+            <p style={responsiveStyles.messageText}>
               {error}
             </p>
 
@@ -471,7 +677,7 @@ function Jobs() {
         ) : jobs.length === 0 ? (
           /* ==================== EMPTY ==================== */
 
-          <div style={styles.messageBox}>
+          <div style={responsiveStyles.messageBox}>
             <div style={styles.emptyIcon}>
               🔎
             </div>
@@ -480,7 +686,7 @@ function Jobs() {
               No jobs found
             </h3>
 
-            <p style={styles.messageText}>
+            <p style={responsiveStyles.messageText}>
               We couldn't find any jobs matching
               your current search and filters.
             </p>
@@ -497,7 +703,7 @@ function Jobs() {
           <>
             {/* ==================== JOB GRID ==================== */}
 
-            <div style={styles.jobGrid}>
+            <div style={responsiveStyles.jobGrid}>
               {jobs.map((job) => {
                 const jobTypeStyle =
                   getJobTypeStyle(job.jobType);
@@ -505,13 +711,11 @@ function Jobs() {
                 return (
                   <article
                     key={job._id}
-                    style={styles.jobCard}
+                    style={responsiveStyles.jobCard}
                   >
                     <div style={styles.cardHeader}>
                       <div style={styles.companyIcon}>
-                        {getCompanyInitial(
-                          job.company
-                        )}
+                        {getCompanyInitial(job.company)}
                       </div>
 
                       <span
@@ -527,7 +731,7 @@ function Jobs() {
                       </span>
                     </div>
 
-                    <h3 style={styles.jobTitle}>
+                    <h3 style={responsiveStyles.jobTitle}>
                       {job.title}
                     </h3>
 
@@ -535,31 +739,21 @@ function Jobs() {
                       {job.company}
                     </p>
 
-                    <div
-                      style={styles.metaContainer}
-                    >
+                    <div style={styles.metaContainer}>
                       <div style={styles.metaItem}>
-                        <span
-                          style={styles.metaIcon}
-                        >
+                        <span style={styles.metaIcon}>
                           📍
                         </span>
 
-                        <span>
-                          {job.location}
-                        </span>
+                        <span>{job.location}</span>
                       </div>
 
                       <div style={styles.metaItem}>
-                        <span
-                          style={styles.metaIcon}
-                        >
+                        <span style={styles.metaIcon}>
                           💰
                         </span>
 
-                        <span>
-                          {job.salary}
-                        </span>
+                        <span>{job.salary}</span>
                       </div>
                     </div>
 
@@ -567,44 +761,35 @@ function Jobs() {
                       {job.description}
                     </p>
 
-                    {job.requirements?.length >
-                      0 && (
+                    {job.requirements?.length > 0 && (
                       <div style={styles.skills}>
                         {job.requirements
                           .slice(0, 3)
-                          .map(
-                            (
-                              requirement,
-                              index
-                            ) => (
-                              <span
-                                key={index}
-                                style={styles.skill}
-                              >
-                                {requirement}
-                              </span>
-                            )
-                          )}
+                          .map((requirement, index) => (
+                            <span
+                              key={index}
+                              style={styles.skill}
+                            >
+                              {requirement}
+                            </span>
+                          ))}
 
-                        {job.requirements.length >
-                          3 && (
+                        {job.requirements.length > 3 && (
                           <span
-                            style={
-                              styles.moreSkills
-                            }
+                            style={styles.moreSkills}
                           >
                             +
-                            {job.requirements
-                              .length - 3}
+                            {job.requirements.length -
+                              3}
                           </span>
                         )}
                       </div>
                     )}
 
-                    <div style={styles.cardFooter}>
-                      <div
-                        style={styles.postedInfo}
-                      >
+                    <div
+                      style={responsiveStyles.cardFooter}
+                    >
+                      <div style={styles.postedInfo}>
                         <span
                           style={styles.postedDot}
                         ></span>
@@ -613,12 +798,10 @@ function Jobs() {
 
                       <Link
                         to={`/jobs/${job._id}`}
-                        style={styles.viewButton}
+                        style={responsiveStyles.viewButton}
                       >
                         View Details
-                        <span
-                          style={styles.arrow}
-                        >
+                        <span style={styles.arrow}>
                           →
                         </span>
                       </Link>
@@ -631,7 +814,7 @@ function Jobs() {
             {/* ==================== PAGINATION ==================== */}
 
             {pagination.totalPages > 1 && (
-              <div style={styles.pagination}>
+              <div style={responsiveStyles.pagination}>
                 <button
                   type="button"
                   disabled={
@@ -643,7 +826,7 @@ function Jobs() {
                     )
                   }
                   style={{
-                    ...styles.paginationButton,
+                    ...responsiveStyles.paginationButton,
                     ...(!pagination.hasPreviousPage
                       ? styles.paginationDisabled
                       : {}),
@@ -655,9 +838,7 @@ function Jobs() {
                 <div style={styles.pageIndicator}>
                   <span>Page</span>
 
-                  <strong>
-                    {currentPage}
-                  </strong>
+                  <strong>{currentPage}</strong>
 
                   <span>of</span>
 
@@ -677,7 +858,7 @@ function Jobs() {
                     )
                   }
                   style={{
-                    ...styles.paginationButton,
+                    ...responsiveStyles.paginationButton,
                     ...(!pagination.hasNextPage
                       ? styles.paginationDisabled
                       : {}),
@@ -704,6 +885,7 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     paddingBottom: "80px",
+    boxSizing: "border-box",
   },
 
   backgroundShapeOne: {
@@ -734,6 +916,7 @@ const styles = {
     padding: "65px 24px 38px",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
   },
 
   heroContent: {
@@ -786,6 +969,7 @@ const styles = {
   heroStatIcon: {
     width: "34px",
     height: "34px",
+    flexShrink: 0,
     borderRadius: "9px",
     background: "#ffffff",
     border: "1px solid #e2e8f0",
@@ -807,6 +991,7 @@ const styles = {
     padding: "0 24px",
     position: "relative",
     zIndex: 2,
+    boxSizing: "border-box",
   },
 
   searchCard: {
@@ -816,6 +1001,7 @@ const styles = {
     padding: "25px",
     boxShadow:
       "0 18px 45px rgba(15, 23, 42, 0.08)",
+    boxSizing: "border-box",
   },
 
   searchHeader: {
@@ -841,6 +1027,7 @@ const styles = {
   searchIcon: {
     width: "42px",
     height: "42px",
+    flexShrink: 0,
     borderRadius: "12px",
     background: "#eef2ff",
     display: "flex",
@@ -858,6 +1045,8 @@ const styles = {
 
   searchField: {
     minWidth: 0,
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   label: {
@@ -875,6 +1064,9 @@ const styles = {
     border: "1px solid #dbe3ef",
     borderRadius: "10px",
     background: "#ffffff",
+    width: "100%",
+    boxSizing: "border-box",
+    overflow: "hidden",
   },
 
   inputIcon: {
@@ -894,10 +1086,12 @@ const styles = {
     padding: "12px 10px 12px 0",
     color: "#1e293b",
     fontSize: "13px",
+    boxSizing: "border-box",
   },
 
   select: {
     width: "100%",
+    minWidth: 0,
     minHeight: "46px",
     border: "1px solid #dbe3ef",
     borderRadius: "10px",
@@ -907,6 +1101,7 @@ const styles = {
     color: "#334155",
     fontSize: "13px",
     cursor: "pointer",
+    boxSizing: "border-box",
   },
 
   searchActions: {
@@ -927,8 +1122,6 @@ const styles = {
     fontSize: "12px",
     fontWeight: "700",
     cursor: "pointer",
-    boxShadow:
-      "0 7px 17px rgba(79, 70, 229, 0.18)",
   },
 
   clearButton: {
@@ -949,6 +1142,7 @@ const styles = {
     padding: "62px 24px 0",
     position: "relative",
     zIndex: 1,
+    boxSizing: "border-box",
   },
 
   resultsHeader: {
@@ -1007,18 +1201,22 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     minHeight: "375px",
+    minWidth: 0,
+    boxSizing: "border-box",
   },
 
   cardHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: "10px",
     marginBottom: "20px",
   },
 
   companyIcon: {
     width: "47px",
     height: "47px",
+    flexShrink: 0,
     borderRadius: "13px",
     background:
       "linear-gradient(135deg, #eef2ff, #e0e7ff)",
@@ -1035,6 +1233,7 @@ const styles = {
     borderRadius: "999px",
     fontSize: "10px",
     fontWeight: "700",
+    whiteSpace: "nowrap",
   },
 
   jobTitle: {
@@ -1043,6 +1242,7 @@ const styles = {
     fontSize: "18px",
     lineHeight: "1.35",
     fontWeight: "800",
+    overflowWrap: "anywhere",
   },
 
   companyName: {
@@ -1050,6 +1250,7 @@ const styles = {
     color: "#4f46e5",
     fontSize: "13px",
     fontWeight: "700",
+    overflowWrap: "anywhere",
   },
 
   metaContainer: {
@@ -1062,14 +1263,17 @@ const styles = {
 
   metaItem: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: "6px",
     color: "#64748b",
     fontSize: "11px",
+    minWidth: 0,
+    overflowWrap: "anywhere",
   },
 
   metaIcon: {
     fontSize: "12px",
+    flexShrink: 0,
   },
 
   jobDescription: {
@@ -1097,6 +1301,7 @@ const styles = {
     color: "#5b21b6",
     fontSize: "10px",
     fontWeight: "600",
+    overflowWrap: "anywhere",
   },
 
   moreSkills: {
@@ -1129,6 +1334,7 @@ const styles = {
   postedDot: {
     width: "6px",
     height: "6px",
+    flexShrink: 0,
     borderRadius: "50%",
     background: "#22c55e",
   },
@@ -1189,6 +1395,7 @@ const styles = {
     textAlign: "center",
     boxShadow:
       "0 10px 30px rgba(15, 23, 42, 0.04)",
+    boxSizing: "border-box",
   },
 
   messageIcon: {
