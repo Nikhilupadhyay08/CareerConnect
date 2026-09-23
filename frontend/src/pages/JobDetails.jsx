@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getJobById, applyForJob } from "../services/api";
+import {
+  getJobById,
+  applyForJob,
+  checkSavedJob,
+  saveJob,
+  removeSavedJob,
+} from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 function JobDetails() {
@@ -12,6 +18,8 @@ function JobDetails() {
 
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -49,6 +57,51 @@ function JobDetails() {
 
     fetchJob();
   }, [id]);
+
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      if (!token || user?.role !== "jobseeker" || !id) {
+        setSaved(false);
+        return;
+      }
+
+      try {
+        const data = await checkSavedJob(token, id);
+        setSaved(data.saved);
+      } catch (error) {
+        console.error("Failed to check saved job:", error);
+        setSaved(false);
+      }
+    };
+
+    checkIfSaved();
+  }, [token, user?.role, id]);
+
+  const handleSaveJob = async () => {
+    if (!token || user?.role !== "jobseeker") {
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      if (saved) {
+        await removeSavedJob(token, id);
+        setSaved(false);
+        setSuccess("Job removed from saved jobs.");
+      } else {
+        await saveJob(token, id);
+        setSaved(true);
+        setSuccess("Job saved successfully.");
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleResumeChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -444,6 +497,40 @@ function JobDetails() {
                 />
               </div>
             </div>
+
+            {/* SAVE JOB */}
+            {user?.role === "jobseeker" && (
+              <div style={styles.saveJobCard}>
+                <button
+                  type="button"
+                  onClick={handleSaveJob}
+                  disabled={saving}
+                  style={{
+                    ...styles.saveJobButton,
+                    ...(saved ? styles.savedJobButton : {}),
+                    ...(saving ? styles.disabledButton : {}),
+                  }}
+                >
+                  <span style={styles.saveJobIcon}>
+                    {saved ? "✓" : "🔖"}
+                  </span>
+
+                  <span>
+                    {saving
+                      ? "Please wait..."
+                      : saved
+                      ? "Job Saved"
+                      : "Save Job"}
+                  </span>
+                </button>
+
+                {success && (
+                  <div style={styles.saveSuccessMessage}>
+                    {success}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* JOBSEEKER APPLY */}
             {user?.role === "jobseeker" && (
@@ -1063,6 +1150,48 @@ const styles = {
     fontSize: "12px",
     textAlign: "right",
     overflowWrap: "anywhere",
+  },
+
+  saveJobCard: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "18px",
+    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+    minWidth: 0,
+  },
+
+  saveJobButton: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "9px",
+    padding: "13px 16px",
+    borderRadius: "10px",
+    border: "1px solid #c7d2fe",
+    background: "#eef2ff",
+    color: "#4f46e5",
+    fontSize: "13px",
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  savedJobButton: {
+    background: "#f0fdf4",
+    borderColor: "#bbf7d0",
+    color: "#15803d",
+  },
+
+  saveJobIcon: {
+    fontSize: "15px",
+  },
+
+  saveSuccessMessage: {
+    marginTop: "10px",
+    color: "#15803d",
+    fontSize: "11px",
+    textAlign: "center",
   },
 
   applyCard: {

@@ -209,6 +209,77 @@ export const deleteJob = async (token, jobId) => {
   );
 };
 
+// ==================== SAVED JOBS ====================
+
+// Save a job
+export const saveJob = async (token, jobId) => {
+  const response = await fetch(
+    `${API_URL}/saved-jobs/${jobId}`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to save job"
+  );
+};
+
+// Remove a saved job
+export const removeSavedJob = async (
+  token,
+  jobId
+) => {
+  const response = await fetch(
+    `${API_URL}/saved-jobs/${jobId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to remove saved job"
+  );
+};
+
+// Get all saved jobs
+export const getSavedJobs = async (token) => {
+  const response = await fetch(
+    `${API_URL}/saved-jobs`,
+    {
+      method: "GET",
+      headers: authHeaders(token),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to fetch saved jobs"
+  );
+};
+
+// Check whether a job is saved
+export const checkSavedJob = async (
+  token,
+  jobId
+) => {
+  const response = await fetch(
+    `${API_URL}/saved-jobs/${jobId}`,
+    {
+      method: "GET",
+      headers: authHeaders(token),
+    }
+  );
+
+  return handleResponse(
+    response,
+    "Failed to check saved job"
+  );
+};
 
 // ==================== APPLICATIONS ====================
 
